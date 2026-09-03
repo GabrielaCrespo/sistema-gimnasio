@@ -1,0 +1,23 @@
+# CONFIGURACIÓN LOCAL
+.env
+
+# DEPENDENCIAS
+/vendor/
+/node_modules/
+
+# LOGS
+/storage/logs/*
+*.log
+
+# ARCHIVOS TEMPORALES
+*.tmp
+*.temp
+
+# SISTEMA OPERATIVO
+.DS_Store
+Thumbs.db
+
+
+# EDITORES / IDE
+.vscode/
+.idea/
