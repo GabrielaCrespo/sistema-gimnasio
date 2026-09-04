@@ -81,16 +81,14 @@ Responsabilidades:
 
 El sistema contempla los siguientes casos de uso principales:
 
-| Código | Caso de uso                                  |
-| ------ | -------------------------------------------- |
-| CU01   | Autenticar usuario en el sistema             |
-| CU02   | Gestionar cuentas de usuario                 |
-| CU03   | Administrar catálogo de grupos musculares    |
-| CU04   | Administrar catálogo de ejercicios           |
-| CU05   | Registrar evaluación física                  |
-| CU06   | Consultar historial de evaluación física     |
-| CU07   | Gestionar y asignar rutinas de entrenamiento |
-| CU08   | Visualizar rutinas asignadas                 |
+| Código | Caso de uso                                |
+| ------ | ------------------------------------------- |
+| CU01   | Gestionar acceso al sistema                |
+| CU02   | Gestionar cuentas de usuario               |
+| CU03   | Administrar catálogo de grupos musculares  |
+| CU04   | Administrar catálogo de ejercicios         |
+| CU05   | Gestionar evaluación física                |
+| CU06   | Gestionar rutinas de entrenamiento         |
 
 
 ## 7. Actores
