@@ -6,6 +6,9 @@
  * CU01: Inicio y cierre de sesión para Administrador, Instructor y Cliente.
  * CU02: Auto-registro de cuentas con rol 'cliente' (sin sesión/parte pública).
  *
+ * También sirve la portada/panel de bienvenida (acción index): al no requerir
+ * sesión ni modelos propios, no justifica un controlador aparte.
+ *
  * Nota: Las cuentas de administrador e instructor solo pueden ser creadas por un
  * administrador desde UsuarioController, no aquí.
  */
@@ -26,12 +29,18 @@ class LoginController
         $this->clienteModelo = new Cliente();
     }
 
+    /** Portada pública o panel de bienvenida, según haya sesión activa (ruta por defecto del sistema). */
+    public function index(): void
+    {
+        require BASE_PATH . '/vistas/dashboard.php';
+    }
+
     /** Muestra la vista(formulario) de inicio de sesión. */
     public function login(): void
     {
-        // Si ya hay una sesión activa redirije a home
+        // Si ya hay una sesión activa redirije a la portada
         if (!empty($_SESSION['user'])) {
-            $this->redirect('home');
+            $this->redirect('login');
         }
 
         $this->render('login', ['error' => null]);
@@ -76,7 +85,7 @@ class LoginController
             'rol' => $usuario['rol'],
         ];
 
-        $this->redirect('home');
+        $this->redirect('login');
     }
 
     /** Cierra la sesión activa y vuelve a la página de inicio. */
@@ -84,15 +93,15 @@ class LoginController
     {
         $_SESSION = [];
         session_destroy();
-        $this->redirect('home');
+        $this->redirect('login');
     }
 
     /** Muestra la vista de auto-registro público (siempre crea una cuenta de tipo cliente). */
     public function register(): void
     {
-        // Si ya hay una sesión activa redirije a home
+        // Si ya hay una sesión activa redirije a la portada
         if (!empty($_SESSION['user'])) {
-            $this->redirect('home');
+            $this->redirect('login');
         }
 
         // Envía a la vista de registro con datos vacíos y sin error
