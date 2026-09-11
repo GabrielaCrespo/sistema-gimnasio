@@ -12,568 +12,376 @@ $usuarioSesion = $_SESSION['user'] ?? null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión de Gimnasio</title>
+    <!-- Tipografía profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primario: #d9782e;
-            --color-primario-oscuro: #a85820;
-            --color-primario-claro: #fbe9d9;
-            --color-oscuro: #21242b;
-            --color-oscuro-2: #2d323b;
-            --color-secundario: #58626c;
-            --color-fondo: #f6f5f2;
-            --color-superficie: #ffffff;
-            --color-borde: #e6e2da;
-            --color-texto: #24211c;
-            --color-texto-suave: #6c6459;
-            --color-peligro: #c0362c;
-            --color-peligro-claro: #fbebea;
-            --color-exito: #2f8a4e;
-            --color-exito-claro: #e8f5ec;
-            --radio: 10px;
-            --radio-chico: 6px;
-            --sombra: 0 1px 2px rgba(20, 15, 10, .08);
-            --sombra-media: 0 14px 30px -12px rgba(20, 15, 10, .3);
-            --transicion: 150ms ease;
+            /* Paleta Rosa Claro & Sofisticada */
+            --color-primario: #e83e8c;         /* Rosa vibrante principal */
+            --color-primario-hover: #d62575;   /* Rosa intenso para hover */
+            --color-primario-suave: #fdf2f6;   /* Fondo rosa muy suave */
+            --color-primario-borde: #fcc2d7;   /* Borde rosa pastel */
+            --color-acento: #ff6b8b;           /* Rosa coral sutil */
+            
+            /* Fondos y Neutros Claros */
+            --color-fondo: #faf7f8;            /* Fondo base perla cálido */
+            --color-superficie: #ffffff;       /* Blanco puro */
+            --color-borde-suave: #f1e4e8;      /* Gris con tinte rosado sutil */
+            
+            /* Textos */
+            --color-texto: #2d242a;            /* Carbón suave cálido (mucho mejor que negro puro) */
+            --color-texto-suave: #796670;      /* Malva grisáceo para textos secundarios */
+            --color-texto-mutado: #a89aa1;
+            
+            /* Radios y Sombras Claras */
+            --radio-lg: 20px;
+            --radio-md: 12px;
+            --radio-sm: 8px;
+            --sombra-suave: 0 4px 20px -2px rgba(232, 62, 140, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --sombra-tarjeta: 0 12px 32px -4px rgba(232, 62, 140, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            --sombra-boton: 0 6px 18px rgba(232, 62, 140, 0.28);
+            --transicion: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--color-fondo);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #fdf6f8 0%, var(--color-fondo) 100%);
             color: var(--color-texto);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1, h2, h3 {
+            font-weight: 700;
+            color: var(--color-texto);
             line-height: 1.25;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
 
         a {
-            color: var(--color-primario-oscuro);
-            text-decoration: none;
-            transition: color var(--transicion);
-        }
-
-        a:hover {
             color: var(--color-primario);
-            text-decoration: underline;
+            text-decoration: none;
+            transition: var(--transicion);
         }
 
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid var(--color-primario);
-            outline-offset: 2px;
-        }
-
-        .contenedor {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 20px 56px;
-        }
-
-        /* Navegación */
+        /* Barra de Navegación Clara */
         .nav {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--color-oscuro);
-            border-bottom: 3px solid var(--color-primario);
-            padding: 14px 24px;
-            box-shadow: var(--sombra-media);
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
         .nav-marca {
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-texto);
             font-weight: 800;
             font-size: 1.15rem;
-            letter-spacing: -0.01em;
-            margin-right: 16px;
+            letter-spacing: -0.02em;
         }
 
-        .nav-marca::before {
-            content: "🏋 ";
+        .nav-marca-icono {
+            background: linear-gradient(135deg, #ff85a1 0%, var(--color-primario) 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(232, 62, 140, 0.25);
         }
 
         .nav-enlaces {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .nav a {
-            color: #c7ccd4;
-            font-size: 0.94rem;
-            font-weight: 500;
-            padding: 4px 2px;
-            border-bottom: 2px solid transparent;
+            color: var(--color-texto-suave);
+            font-size: 0.92rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radio-sm);
         }
 
         .nav a:hover {
-            color: #fff;
+            color: var(--color-primario);
+            background: var(--color-primario-suave);
             text-decoration: none;
-            border-bottom-color: var(--color-primario);
         }
 
         .nav-salir {
-            color: #fff;
-            font-weight: 600;
+            color: var(--color-primario) !important;
+            background: var(--color-primario-suave) !important;
+            border: 1px solid var(--color-primario-borde);
         }
 
-        /* Landing / dashboard: banda oscura tipo "hero" */
+        .nav-salir:hover {
+            background: var(--color-primario) !important;
+            color: #ffffff !important;
+        }
+
+        /* Contenedor Principal */
+        .contenedor {
+            max-width: 1140px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 44px 24px;
+            flex: 1;
+        }
+
+        /* Landing / Hero Claro */
         .landing {
-            background: linear-gradient(135deg, var(--color-oscuro), var(--color-oscuro-2));
-            color: #fff;
-            border-radius: var(--radio);
-            box-shadow: var(--sombra-media);
-            padding: 48px 36px;
-            text-align: center;
+            position: relative;
+            background: #ffffff;
+            border-radius: var(--radio-lg);
+            padding: 56px 48px;
+            overflow: hidden;
+            border: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-tarjeta);
+        }
+
+        /* Destellos decorativos rosas de fondo */
+        .landing::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            right: -100px;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(255, 133, 161, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .landing::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(232, 62, 140, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .landing-header {
+            position: relative;
+            max-width: 620px;
+            z-index: 2;
         }
 
         .landing h1 {
-            margin: 0 0 8px;
-            font-size: 2.1rem;
+            font-size: 2.35rem;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .landing h1 span {
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff6584 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .landing p {
-            color: #c7ccd4;
-            font-size: 1.02rem;
-            max-width: 46em;
-            margin: 0 auto;
+            color: var(--color-texto-suave);
+            font-size: 1.05rem;
+            line-height: 1.6;
         }
 
-        .landing-acciones {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 26px;
-            flex-wrap: wrap;
+        /* Chip / Badge del Rol */
+        .perfil-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-primario-suave);
+            border: 1px solid var(--color-primario-borde);
+            color: var(--color-primario-hover);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
         }
 
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 28px;
-            text-align: left;
-        }
-
-        .tarjeta {
-            display: block;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-left: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            padding: 20px;
-            font-weight: 600;
-            color: #fff;
-            transition: transform var(--transicion), background var(--transicion), border-color var(--transicion);
-        }
-
-        .tarjeta:hover {
-            background: rgba(255, 255, 255, .12);
-            border-color: var(--color-primario);
-            transform: translateY(-2px);
-            text-decoration: none;
+        .perfil-badge-punto {
+            width: 8px;
+            height: 8px;
+            background: var(--color-primario);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(232, 62, 140, 0.6);
         }
 
         /* Botones */
+        .landing-acciones {
+            display: flex;
+            gap: 14px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
         .boton {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radio-chico);
-            background: var(--color-primario);
-            color: #fff;
-            border: 1px solid transparent;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radio-md);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
+            color: #ffffff;
+            font-size: 0.96rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            box-shadow: var(--sombra);
-            transition: background var(--transicion), transform var(--transicion), box-shadow var(--transicion);
+            border: none;
+            box-shadow: var(--sombra-boton);
+            transition: var(--transicion);
         }
 
         .boton:hover {
-            background: var(--color-primario-oscuro);
+            color: #ffffff;
             text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--sombra-media);
-        }
-
-        .boton:active {
-            transform: translateY(0);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(232, 62, 140, 0.38);
         }
 
         .boton-secundario {
-            background: transparent;
-            color: #fff;
-            border-color: rgba(255, 255, 255, .35);
+            background: var(--color-superficie);
+            color: var(--color-texto);
+            border: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
         .boton-secundario:hover {
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            border-color: #fff;
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            border-color: var(--color-primario-borde);
+            transform: translateY(-2px);
         }
 
-        /* Fuera del hero oscuro (paneles claros), el botón secundario usa tinta oscura */
-        .panel .boton-secundario,
-        .panel-cabecera .boton-secundario {
-            color: var(--color-primario-oscuro);
-            border-color: var(--color-borde);
+        /* Tarjetas de Acciones Rápidas Claras */
+        .tarjetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 36px;
+            position: relative;
+            z-index: 2;
         }
 
-        .panel .boton-secundario:hover,
-        .panel-cabecera .boton-secundario:hover {
-            background: var(--color-primario-claro);
-            border-color: var(--color-primario);
-        }
-
-        .boton-peligro {
-            background: var(--color-peligro);
-        }
-
-        .boton-peligro:hover {
-            background: #8a1d17;
-        }
-
-        .boton-pequeno {
-            padding: 6px 12px;
-            font-size: 0.83rem;
-            box-shadow: none;
-        }
-
-        /* Tarjetas de contenido / formularios */
-        .panel {
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            padding: 26px 28px;
-            margin-top: 24px;
-        }
-
-        .panel h1 {
-            font-size: 1.4rem;
-            margin: 0;
-        }
-
-        .panel-cabecera {
+        .tarjeta {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .formulario {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 560px;
-        }
-
-        .formulario-ancho {
-            max-width: none;
-        }
-
-        .campo {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        /* El atributo HTML "hidden" necesita más especificidad que
-           ".campo { display: flex }" para ocultar el bloque de verdad. */
-        .campo[hidden] {
-            display: none;
-        }
-
-        .campo label {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--color-secundario);
-        }
-
-        .campo input,
-        .campo select,
-        .campo textarea {
-            padding: 10px 12px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio-chico);
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: var(--color-superficie);
+            padding: 22px 24px;
+            background: #ffffff;
+            border: 1px solid var(--color-borde-suave);
+            border-left: 4px solid var(--color-primario-borde);
+            border-radius: var(--radio-md);
             color: var(--color-texto);
-            transition: border-color var(--transicion), box-shadow var(--transicion);
+            font-weight: 600;
+            font-size: 0.98rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: var(--transicion);
         }
 
-        .campo input:hover,
-        .campo select:hover,
-        .campo textarea:hover {
-            border-color: #cfc9bd;
-        }
-
-        .campo input:focus,
-        .campo select:focus,
-        .campo textarea:focus {
-            outline: none;
-            border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px var(--color-primario-claro);
-        }
-
-        .campo input:disabled {
-            background: #f2f1ed;
-            color: var(--color-texto-suave);
-        }
-
-        .campo textarea {
-            resize: vertical;
-        }
-
-        .fila-formulario {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        /* Tablas */
-        .tabla-envoltura {
-            overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio);
-            scrollbar-width: thin;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--color-superficie);
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px 14px;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: var(--color-oscuro);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--color-borde);
-            transition: background var(--transicion);
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #faf9f6;
-        }
-
-        tbody tr:hover {
-            background: var(--color-primario-claro);
-        }
-
-        td .acciones {
+        .tarjeta .flecha {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        /* Mensajes / alertas */
-        .alerta {
-            padding: 12px 16px;
-            border-radius: var(--radio-chico);
-            margin-bottom: 16px;
-            font-size: 0.92rem;
-            border-left: 3px solid transparent;
-        }
-
-        .alerta-error {
-            background: var(--color-peligro-claro);
-            color: var(--color-peligro);
-            border-left-color: var(--color-peligro);
-        }
-
-        .alerta-error::before {
-            content: "⚠ ";
-        }
-
-        .alerta-exito {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-            border-left-color: var(--color-exito);
-        }
-
-        .alerta-exito::before {
-            content: "✓ ";
-        }
-
-        /* Insignias de estado */
-        .insignia {
-            display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .insignia::before {
-            content: "";
-            width: 6px;
-            height: 6px;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: currentColor;
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            font-weight: bold;
+            transition: var(--transicion);
         }
 
-        .insignia-activo {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
+        .tarjeta:hover {
+            border-color: var(--color-primario-borde);
+            border-left-color: var(--color-primario);
+            transform: translateY(-3px);
+            color: var(--color-primario-hover);
+            box-shadow: var(--sombra-tarjeta);
+            text-decoration: none;
         }
 
-        .insignia-inactivo {
-            background: #f0efeb;
-            color: var(--color-texto-suave);
-        }
-
-        .insignia-rol {
-            background: var(--color-primario-claro);
-            color: var(--color-primario-oscuro);
-        }
-
-        /* Páginas de error */
-        .error-pagina {
-            text-align: center;
-            padding: 72px 20px;
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            margin-top: 24px;
-        }
-
-        .error-pagina h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-        }
-
-        .error-pagina p {
-            color: var(--color-texto-suave);
-            margin-bottom: 20px;
-        }
-
-        /* Auth (login/registro) */
-        .auth-panel {
-            max-width: 420px;
-            margin: 56px auto;
-            border-top: 3px solid var(--color-primario);
-        }
-
-        .auth-panel h1 {
-            font-size: 1.4rem;
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .auth-pie {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
-            color: var(--color-texto-suave);
+        .tarjeta:hover .flecha {
+            background: var(--color-primario);
+            color: #ffffff;
+            transform: translateX(4px);
         }
 
         /* Pie de página */
         .pie {
-            margin-top: 40px;
-            padding: 20px 16px 36px;
+            margin-top: auto;
+            padding: 26px;
             text-align: center;
             color: var(--color-texto-suave);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--color-borde-suave);
+            background: rgba(255, 255, 255, 0.7);
         }
 
-        /* Utilidades */
-        .texto-suave {
-            color: var(--color-texto-suave);
-        }
-
-        .espacio-superior {
-            margin-top: 16px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 640px) {
-            .contenedor {
-                padding: 20px 14px 40px;
-            }
-
+        /* Adaptabilidad móvil */
+        @media (max-width: 768px) {
             .nav {
-                padding: 12px 16px;
+                padding: 14px 20px;
             }
-
             .landing {
-                padding: 32px 22px;
+                padding: 34px 22px;
             }
-
             .landing h1 {
-                font-size: 1.7rem;
+                font-size: 1.85rem;
             }
-
             .landing-acciones {
                 flex-direction: column;
             }
-
-            .landing-acciones .boton {
+            .boton {
                 width: 100%;
-                justify-content: center;
-            }
-
-            .panel {
-                padding: 20px;
-            }
-
-            .auth-panel {
-                margin: 24px auto;
             }
         }
     </style>
 </head>
 <body>
+
 <?php if ($usuarioSesion): ?>
     <nav class="nav">
-        <span class="nav-marca">Gimnasio</span>
+        <div class="nav-marca">
+            <span class="nav-marca-icono">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+            </span>
+            Gimnasio
+        </div>
         <div class="nav-enlaces">
             <a href="<?= url('login') ?>">Inicio</a>
             <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
@@ -596,40 +404,79 @@ $usuarioSesion = $_SESSION['user'] ?? null;
         </div>
     </nav>
 <?php endif; ?>
+
 <main class="contenedor">
+    <section class="landing">
+        <?php if ($usuarioSesion): ?>
+            <div class="perfil-badge">
+                <span class="perfil-badge-punto"></span>
+                Rol: <?= e(ucfirst($usuarioSesion['rol'])) ?>
+            </div>
+            
+            <div class="landing-header">
+                <h1>Hola de nuevo, <span><?= e($usuarioSesion['nombre']) ?></span> ✨</h1>
+                <p>Bienvenido al panel de gestión. Accede rápidamente a tus módulos principales a continuación.</p>
+            </div>
 
-<section class="landing">
-    <?php if ($usuarioSesion): ?>
-        <h1>Bienvenido/a, <?= e($usuarioSesion['nombre']) ?></h1>
-        <p>Rol: <?= e(ucfirst($usuarioSesion['rol'])) ?></p>
+            <div class="tarjetas">
+                <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
+                    <a class="tarjeta" href="<?= url('usuario') ?>">
+                        <span>Gestionar usuarios</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= url('grupoMuscular') ?>">
+                        <span>Grupos musculares</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= url('ejercicio') ?>">
+                        <span>Catálogo de ejercicios</span>
+                        <span class="flecha">→</span>
+                    </a>
+                <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
+                    <a class="tarjeta" href="<?= url('evaluacionFisica', 'registrar') ?>">
+                        <span>Registrar evaluación</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= url('rutina') ?>">
+                        <span>Gestionar rutinas</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= url('ejercicio') ?>">
+                        <span>Catálogo de ejercicios</span>
+                        <span class="flecha">→</span>
+                    </a>
+                <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
+                    <a class="tarjeta" href="<?= url('rutina') ?>">
+                        <span>Mis rutinas activas</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= url('evaluacionFisica', 'historial') ?>">
+                        <span>Historial de evaluaciones</span>
+                        <span class="flecha">→</span>
+                    </a>
+                <?php endif; ?>
+            </div>
 
-        <div class="tarjetas">
-            <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-                <a class="tarjeta" href="<?= url('usuario') ?>">Gestionar usuarios</a>
-                <a class="tarjeta" href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-                <a class="tarjeta" href="<?= url('ejercicio') ?>">Ejercicios</a>
-            <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-                <a class="tarjeta" href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-                <a class="tarjeta" href="<?= url('rutina') ?>">Gestionar rutinas</a>
-                <a class="tarjeta" href="<?= url('ejercicio') ?>">Catálogo de ejercicios</a>
-            <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-                <a class="tarjeta" href="<?= url('rutina') ?>">Mis rutinas</a>
-                <a class="tarjeta" href="<?= url('evaluacionFisica', 'historial') ?>">Mi historial de evaluaciones</a>
-            <?php endif; ?>
-        </div>
-    <?php else: ?>
-        <h1>Sistema de Gestión de Gimnasio</h1>
-        <p>Administra usuarios, ejercicios, evaluaciones físicas y rutinas de entrenamiento en un solo lugar.</p>
-        <div class="landing-acciones">
-            <a class="boton" href="<?= url('login', 'login') ?>">Iniciar sesión</a>
-            <a class="boton boton-secundario" href="<?= url('login', 'register') ?>">Crear cuenta</a>
-        </div>
-    <?php endif; ?>
-</section>
-
+        <?php else: ?>
+            <div class="landing-header">
+                <h1>Tu bienestar y progreso en <span>un solo lugar</span></h1>
+                <p>Una plataforma moderna y sencilla para gestionar rutinas, control de socios, progresos físicos y ejercicios de entrenamiento.</p>
+            </div>
+            <div class="landing-acciones">
+                <a class="boton" href="<?= url('login', 'login') ?>">
+                    Iniciar sesión
+                </a>
+                <a class="boton boton-secundario" href="<?= url('login', 'register') ?>">
+                    Crear cuenta
+                </a>
+            </div>
+        <?php endif; ?>
+    </section>
 </main>
+
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio</p>
+    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
+
 </body>
 </html>

@@ -11,647 +11,374 @@ $datos = $datos ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Gimnasio</title>
+    <title><?= $accion === 'register' ? 'Crear Cuenta' : 'Iniciar Sesión' ?> - Gimnasio</title>
+    <!-- Tipografía profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primario: #d9782e;
-            --color-primario-oscuro: #a85820;
-            --color-primario-claro: #fbe9d9;
-            --color-oscuro: #21242b;
-            --color-oscuro-2: #2d323b;
-            --color-secundario: #58626c;
-            --color-fondo: #f6f5f2;
+            /* Paleta Rosa Claro & Sofisticada */
+            --color-primario: #e83e8c;
+            --color-primario-hover: #d62575;
+            --color-primario-suave: #fdf2f6;
+            --color-primario-borde: #fcc2d7;
+            --color-acento: #ff6b8b;
+            
+            /* Fondos y Neutros Claros */
+            --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
-            --color-borde: #e6e2da;
-            --color-texto: #24211c;
-            --color-texto-suave: #6c6459;
-            --color-peligro: #c0362c;
-            --color-peligro-claro: #fbebea;
-            --color-exito: #2f8a4e;
-            --color-exito-claro: #e8f5ec;
-            --radio: 10px;
-            --radio-chico: 6px;
-            --sombra: 0 1px 2px rgba(20, 15, 10, .08);
-            --sombra-media: 0 14px 30px -12px rgba(20, 15, 10, .3);
-            --transicion: 150ms ease;
+            --color-borde-suave: #f1e4e8;
+            
+            /* Textos */
+            --color-texto: #2d242a;
+            --color-texto-suave: #796670;
+            --color-texto-mutado: #a89aa1;
+            
+            /* Estados */
+            --color-peligro: #ef4444;
+            --color-peligro-claro: #fef2f2;
+            --color-peligro-borde: #fecaca;
+            --color-exito: #10b981;
+            --color-exito-claro: #ecfdf5;
+
+            /* Radios y Sombras */
+            --radio-lg: 22px;
+            --radio-md: 12px;
+            --radio-sm: 8px;
+            --sombra-suave: 0 4px 20px -2px rgba(232, 62, 140, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --sombra-tarjeta: 0 16px 36px -4px rgba(232, 62, 140, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.04);
+            --sombra-boton: 0 6px 18px rgba(232, 62, 140, 0.28);
+            --transicion: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--color-fondo);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at 50% 0%, #fff0f4 0%, var(--color-fondo) 100%);
             color: var(--color-texto);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-        }
-
-        h1, h2, h3 {
-            line-height: 1.25;
-            letter-spacing: -0.01em;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         a {
-            color: var(--color-primario-oscuro);
+            color: var(--color-primario);
+            font-weight: 600;
             text-decoration: none;
-            transition: color var(--transicion);
+            transition: var(--transicion);
         }
 
         a:hover {
-            color: var(--color-primario);
+            color: var(--color-primario-hover);
             text-decoration: underline;
-        }
-
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid var(--color-primario);
-            outline-offset: 2px;
         }
 
         .contenedor {
             max-width: 1100px;
+            width: 100%;
             margin: 0 auto;
-            padding: 32px 20px 56px;
-        }
-
-        /* Navegación */
-        .nav {
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            padding: 32px 20px 48px;
+            flex: 1;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--color-oscuro);
-            border-bottom: 3px solid var(--color-primario);
-            padding: 14px 24px;
-            box-shadow: var(--sombra-media);
-        }
-
-        .nav-marca {
-            color: #fff;
-            font-weight: 800;
-            font-size: 1.15rem;
-            letter-spacing: -0.01em;
-            margin-right: 16px;
-        }
-
-        .nav-marca::before {
-            content: "🏋 ";
-        }
-
-        .nav-enlaces {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .nav a {
-            color: #c7ccd4;
-            font-size: 0.94rem;
-            font-weight: 500;
-            padding: 4px 2px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .nav a:hover {
-            color: #fff;
-            text-decoration: none;
-            border-bottom-color: var(--color-primario);
-        }
-
-        .nav-salir {
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* Landing / dashboard: banda oscura tipo "hero" */
-        .landing {
-            background: linear-gradient(135deg, var(--color-oscuro), var(--color-oscuro-2));
-            color: #fff;
-            border-radius: var(--radio);
-            box-shadow: var(--sombra-media);
-            padding: 48px 36px;
-            text-align: center;
-        }
-
-        .landing h1 {
-            margin: 0 0 8px;
-            font-size: 2.1rem;
-        }
-
-        .landing p {
-            color: #c7ccd4;
-            font-size: 1.02rem;
-            max-width: 46em;
-            margin: 0 auto;
-        }
-
-        .landing-acciones {
-            display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 26px;
-            flex-wrap: wrap;
         }
 
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 28px;
-            text-align: left;
+        /* Tarjeta de Autenticación */
+        .auth-panel {
+            width: 100%;
+            background: var(--color-superficie);
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-lg);
+            box-shadow: var(--sombra-tarjeta);
+            padding: 42px 40px;
+            position: relative;
         }
 
-        .tarjeta {
-            display: block;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-left: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            padding: 20px;
-            font-weight: 600;
-            color: #fff;
-            transition: transform var(--transicion), background var(--transicion), border-color var(--transicion);
+        .auth-panel-login {
+            max-width: 440px;
         }
 
-        .tarjeta:hover {
-            background: rgba(255, 255, 255, .12);
-            border-color: var(--color-primario);
-            transform: translateY(-2px);
-            text-decoration: none;
+        .auth-panel-registro {
+            max-width: 620px;
         }
 
-        /* Botones */
-        .boton {
+        /* Encabezado con Ícono */
+        .auth-cabecera {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-marca-icono {
+            background: linear-gradient(135deg, #ff85a1 0%, var(--color-primario) 100%);
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radio-chico);
-            background: var(--color-primario);
-            color: #fff;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            box-shadow: var(--sombra);
-            transition: background var(--transicion), transform var(--transicion), box-shadow var(--transicion);
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(232, 62, 140, 0.3);
+            margin-bottom: 14px;
         }
 
-        .boton:hover {
-            background: var(--color-primario-oscuro);
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--sombra-media);
+        .auth-cabecera h1 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--color-texto);
+            letter-spacing: -0.02em;
         }
 
-        .boton:active {
-            transform: translateY(0);
+        .auth-cabecera p {
+            color: var(--color-texto-suave);
+            font-size: 0.92rem;
+            margin-top: 4px;
         }
 
-        .boton-secundario {
-            background: transparent;
-            color: #fff;
-            border-color: rgba(255, 255, 255, .35);
-        }
-
-        .boton-secundario:hover {
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        /* Fuera del hero oscuro (paneles claros), el botón secundario usa tinta oscura */
-        .panel .boton-secundario,
-        .panel-cabecera .boton-secundario {
-            color: var(--color-primario-oscuro);
-            border-color: var(--color-borde);
-        }
-
-        .panel .boton-secundario:hover,
-        .panel-cabecera .boton-secundario:hover {
-            background: var(--color-primario-claro);
-            border-color: var(--color-primario);
-        }
-
-        .boton-peligro {
-            background: var(--color-peligro);
-        }
-
-        .boton-peligro:hover {
-            background: #8a1d17;
-        }
-
-        .boton-pequeno {
-            padding: 6px 12px;
-            font-size: 0.83rem;
-            box-shadow: none;
-        }
-
-        /* Tarjetas de contenido / formularios */
-        .panel {
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            padding: 26px 28px;
-            margin-top: 24px;
-        }
-
-        .panel h1 {
-            font-size: 1.4rem;
-            margin: 0;
-        }
-
-        .panel-cabecera {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
+        /* Formularios y Campos */
         .formulario {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 560px;
-        }
-
-        .formulario-ancho {
-            max-width: none;
+            gap: 18px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        /* El atributo HTML "hidden" necesita más especificidad que
-           ".campo { display: flex }" para ocultar el bloque de verdad. */
-        .campo[hidden] {
-            display: none;
+            gap: 7px;
         }
 
         .campo label {
             font-weight: 600;
             font-size: 0.88rem;
-            color: var(--color-secundario);
-        }
-
-        .campo input,
-        .campo select,
-        .campo textarea {
-            padding: 10px 12px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio-chico);
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: var(--color-superficie);
             color: var(--color-texto);
-            transition: border-color var(--transicion), box-shadow var(--transicion);
         }
 
-        .campo input:hover,
-        .campo select:hover,
-        .campo textarea:hover {
-            border-color: #cfc9bd;
+        .campo input {
+            padding: 12px 14px;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            font-size: 0.94rem;
+            font-family: inherit;
+            background: #ffffff;
+            color: var(--color-texto);
+            transition: var(--transicion);
         }
 
-        .campo input:focus,
-        .campo select:focus,
-        .campo textarea:focus {
+        .campo input:focus {
             outline: none;
             border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px var(--color-primario-claro);
-        }
-
-        .campo input:disabled {
-            background: #f2f1ed;
-            color: var(--color-texto-suave);
-        }
-
-        .campo textarea {
-            resize: vertical;
+            box-shadow: 0 0 0 4px var(--color-primario-suave);
         }
 
         .fila-formulario {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }
 
-        /* Tablas */
-        .tabla-envoltura {
-            overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio);
-            scrollbar-width: thin;
-        }
-
-        table {
+        /* Botón de Enviar */
+        .boton-auth {
+            margin-top: 8px;
             width: 100%;
-            border-collapse: collapse;
-            background: var(--color-superficie);
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px 14px;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: var(--color-oscuro);
-            color: #fff;
+            padding: 12px 20px;
+            border-radius: var(--radio-md);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
+            color: #ffffff;
+            font-size: 0.98rem;
             font-weight: 700;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--sombra-boton);
+            transition: var(--transicion);
         }
 
-        tbody tr {
-            border-bottom: 1px solid var(--color-borde);
-            transition: background var(--transicion);
+        .boton-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(232, 62, 140, 0.38);
         }
 
-        tbody tr:last-child {
-            border-bottom: none;
+        /* Pie de la Tarjeta */
+        .auth-pie {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--color-borde-suave);
+            font-size: 0.91rem;
+            text-align: center;
+            color: var(--color-texto-suave);
         }
 
-        tbody tr:nth-child(even) {
-            background: #faf9f6;
+        .auth-volver {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.86rem;
+            color: var(--color-texto-suave);
+            font-weight: 500;
         }
 
-        tbody tr:hover {
-            background: var(--color-primario-claro);
+        .auth-volver:hover {
+            color: var(--color-primario);
+            text-decoration: none;
         }
 
-        td .acciones {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        /* Mensajes / alertas */
+        /* Alerta de Error */
         .alerta {
             padding: 12px 16px;
-            border-radius: var(--radio-chico);
-            margin-bottom: 16px;
-            font-size: 0.92rem;
-            border-left: 3px solid transparent;
+            border-radius: var(--radio-md);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alerta-error {
             background: var(--color-peligro-claro);
             color: var(--color-peligro);
-            border-left-color: var(--color-peligro);
+            border: 1px solid var(--color-peligro-borde);
         }
 
-        .alerta-error::before {
-            content: "⚠ ";
-        }
-
-        .alerta-exito {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-            border-left-color: var(--color-exito);
-        }
-
-        .alerta-exito::before {
-            content: "✓ ";
-        }
-
-        /* Insignias de estado */
-        .insignia {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .insignia::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .insignia-activo {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-        }
-
-        .insignia-inactivo {
-            background: #f0efeb;
-            color: var(--color-texto-suave);
-        }
-
-        .insignia-rol {
-            background: var(--color-primario-claro);
-            color: var(--color-primario-oscuro);
-        }
-
-        /* Páginas de error */
-        .error-pagina {
-            text-align: center;
-            padding: 72px 20px;
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            margin-top: 24px;
-        }
-
-        .error-pagina h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-        }
-
-        .error-pagina p {
-            color: var(--color-texto-suave);
-            margin-bottom: 20px;
-        }
-
-        /* Auth (login/registro) */
-        .auth-panel {
-            max-width: 420px;
-            margin: 56px auto;
-            border-top: 3px solid var(--color-primario);
-        }
-
-        .auth-panel h1 {
-            font-size: 1.4rem;
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .auth-pie {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
-            color: var(--color-texto-suave);
-        }
-
-        /* Pie de página */
+        /* Pie de Página */
         .pie {
-            margin-top: 40px;
-            padding: 20px 16px 36px;
+            padding: 24px;
             text-align: center;
             color: var(--color-texto-suave);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--color-borde-suave);
+            background: rgba(255, 255, 255, 0.7);
         }
 
-        /* Utilidades */
-        .texto-suave {
-            color: var(--color-texto-suave);
-        }
-
-        .espacio-superior {
-            margin-top: 16px;
-        }
-
-        /* Responsivo */
         @media (max-width: 640px) {
-            .contenedor {
-                padding: 20px 14px 40px;
-            }
-
-            .nav {
-                padding: 12px 16px;
-            }
-
-            .landing {
-                padding: 32px 22px;
-            }
-
-            .landing h1 {
-                font-size: 1.7rem;
-            }
-
-            .landing-acciones {
-                flex-direction: column;
-            }
-
-            .landing-acciones .boton {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .panel {
-                padding: 20px;
-            }
-
             .auth-panel {
-                margin: 24px auto;
+                padding: 30px 20px;
+            }
+            .fila-formulario {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+
 <main class="contenedor">
 
 <?php if ($accion === 'register'): ?>
 
-    <section class="auth-panel panel">
-        <h1>Crear cuenta de cliente</h1>
+    <section class="auth-panel auth-panel-registro">
+        <div class="auth-cabecera">
+            <span class="auth-marca-icono">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+            </span>
+            <h1>Crear cuenta de cliente</h1>
+            <p>Empieza a entrenar y da seguimiento a tu progreso físico</p>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario" method="post" action="<?= url('login', 'crearCuenta') ?>">
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="nombres">Nombres</label>
-                    <input type="text" id="nombres" name="nombres" value="<?= e($datos['nombres'] ?? '') ?>" required>
+                    <input type="text" id="nombres" name="nombres" value="<?= e($datos['nombres'] ?? '') ?>" placeholder="Ej: Valentina" required>
                 </div>
                 <div class="campo">
                     <label for="apellidos">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="<?= e($datos['apellidos'] ?? '') ?>" required>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= e($datos['apellidos'] ?? '') ?>" placeholder="Ej: Gómez Rojas" required>
                 </div>
             </div>
+
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="ci">Cédula de identidad</label>
-                    <input type="text" id="ci" name="ci" value="<?= e($datos['ci'] ?? '') ?>" required>
+                    <input type="text" id="ci" name="ci" value="<?= e($datos['ci'] ?? '') ?>" placeholder="Número de documento" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
                     <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= e($datos['fecha_nacimiento'] ?? '') ?>" required>
                 </div>
             </div>
+
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" value="<?= e($datos['correo'] ?? '') ?>" required>
+                <input type="email" id="correo" name="correo" value="<?= e($datos['correo'] ?? '') ?>" placeholder="nombre@ejemplo.com" required>
             </div>
+
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required minlength="6">
+                    <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
                 </div>
                 <div class="campo">
                     <label for="password_confirmacion">Confirmar contraseña</label>
-                    <input type="password" id="password_confirmacion" name="password_confirmacion" required minlength="6">
+                    <input type="password" id="password_confirmacion" name="password_confirmacion" placeholder="Repite tu contraseña" required minlength="6">
                 </div>
             </div>
-            <button type="submit" class="boton">Crear cuenta</button>
+
+            <button type="submit" class="boton-auth">Crear cuenta</button>
         </form>
 
         <p class="auth-pie">¿Ya tienes cuenta? <a href="<?= url('login', 'login') ?>">Inicia sesión</a></p>
+        <a href="<?= url('login') ?>" class="auth-volver">← Volver al inicio</a>
     </section>
 
 <?php else: ?>
 
-    <section class="auth-panel panel">
-        <h1>Iniciar sesión</h1>
+    <section class="auth-panel auth-panel-login">
+        <div class="auth-cabecera">
+            <span class="auth-marca-icono">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+            </span>
+            <h1>Iniciar sesión</h1>
+            <p>Ingresa tus credenciales para acceder a tu panel</p>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario" method="post" action="<?= url('login', 'autenticar') ?>">
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" required autofocus>
+                <input type="email" id="correo" name="correo" placeholder="nombre@ejemplo.com" required autofocus>
             </div>
             <div class="campo">
                 <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
             </div>
-            <button type="submit" class="boton">Ingresar</button>
+            <button type="submit" class="boton-auth">Ingresar al sistema</button>
         </form>
 
         <p class="auth-pie">¿No tienes cuenta? <a href="<?= url('login', 'register') ?>">Regístrate como cliente</a></p>
+        <a href="<?= url('login') ?>" class="auth-volver">← Volver al inicio</a>
     </section>
 
 <?php endif; ?>
 
 </main>
+
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio</p>
+    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
+
 </body>
 </html>

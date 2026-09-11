@@ -11,268 +11,165 @@ $datos = $datos ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Gimnasio</title>
+    <title>Evaluaciones Físicas - Sistema de Gimnasio</title>
+    <!-- Tipografía profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primario: #d9782e;
-            --color-primario-oscuro: #a85820;
-            --color-primario-claro: #fbe9d9;
-            --color-oscuro: #21242b;
-            --color-oscuro-2: #2d323b;
-            --color-secundario: #58626c;
-            --color-fondo: #f6f5f2;
+            /* Paleta Rosa Claro & Sofisticada */
+            --color-primario: #e83e8c;
+            --color-primario-hover: #d62575;
+            --color-primario-suave: #fdf2f6;
+            --color-primario-borde: #fcc2d7;
+            --color-acento: #ff6b8b;
+            
+            /* Fondos y Neutros Claros */
+            --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
-            --color-borde: #e6e2da;
-            --color-texto: #24211c;
-            --color-texto-suave: #6c6459;
-            --color-peligro: #c0362c;
-            --color-peligro-claro: #fbebea;
-            --color-exito: #2f8a4e;
-            --color-exito-claro: #e8f5ec;
-            --radio: 10px;
-            --radio-chico: 6px;
-            --sombra: 0 1px 2px rgba(20, 15, 10, .08);
-            --sombra-media: 0 14px 30px -12px rgba(20, 15, 10, .3);
-            --transicion: 150ms ease;
+            --color-borde-suave: #f1e4e8;
+            
+            /* Textos */
+            --color-texto: #2d242a;
+            --color-texto-suave: #796670;
+            --color-texto-mutado: #a89aa1;
+            
+            /* Estados */
+            --color-peligro: #ef4444;
+            --color-peligro-claro: #fef2f2;
+            --color-peligro-borde: #fecaca;
+            --color-exito: #10b981;
+            --color-exito-claro: #ecfdf5;
+
+            /* Radios y Sombras */
+            --radio-lg: 20px;
+            --radio-md: 12px;
+            --radio-sm: 8px;
+            --sombra-suave: 0 4px 20px -2px rgba(232, 62, 140, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --sombra-tarjeta: 0 12px 32px -4px rgba(232, 62, 140, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            --sombra-boton: 0 6px 18px rgba(232, 62, 140, 0.25);
+            --transicion: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--color-fondo);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #fdf6f8 0%, var(--color-fondo) 100%);
             color: var(--color-texto);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1, h2, h3 {
+            font-weight: 700;
+            color: var(--color-texto);
             line-height: 1.25;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
 
         a {
-            color: var(--color-primario-oscuro);
-            text-decoration: none;
-            transition: color var(--transicion);
-        }
-
-        a:hover {
             color: var(--color-primario);
-            text-decoration: underline;
+            text-decoration: none;
+            transition: var(--transicion);
         }
 
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid var(--color-primario);
-            outline-offset: 2px;
-        }
-
-        .contenedor {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 20px 56px;
-        }
-
-        /* Navegación */
+        /* Barra de Navegación */
         .nav {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--color-oscuro);
-            border-bottom: 3px solid var(--color-primario);
-            padding: 14px 24px;
-            box-shadow: var(--sombra-media);
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
         .nav-marca {
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-texto);
             font-weight: 800;
             font-size: 1.15rem;
-            letter-spacing: -0.01em;
-            margin-right: 16px;
+            letter-spacing: -0.02em;
         }
 
-        .nav-marca::before {
-            content: "🏋 ";
+        .nav-marca-icono {
+            background: linear-gradient(135deg, #ff85a1 0%, var(--color-primario) 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(232, 62, 140, 0.25);
         }
 
         .nav-enlaces {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .nav a {
-            color: #c7ccd4;
-            font-size: 0.94rem;
-            font-weight: 500;
-            padding: 4px 2px;
-            border-bottom: 2px solid transparent;
+            color: var(--color-texto-suave);
+            font-size: 0.92rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radio-sm);
         }
 
-        .nav a:hover {
-            color: #fff;
+        .nav a:hover,
+        .nav a.activo {
+            color: var(--color-primario);
+            background: var(--color-primario-suave);
             text-decoration: none;
-            border-bottom-color: var(--color-primario);
         }
 
         .nav-salir {
-            color: #fff;
-            font-weight: 600;
+            color: var(--color-primario) !important;
+            background: var(--color-primario-suave) !important;
+            border: 1px solid var(--color-primario-borde);
         }
 
-        /* Landing / dashboard: banda oscura tipo "hero" */
-        .landing {
-            background: linear-gradient(135deg, var(--color-oscuro), var(--color-oscuro-2));
-            color: #fff;
-            border-radius: var(--radio);
-            box-shadow: var(--sombra-media);
-            padding: 48px 36px;
-            text-align: center;
+        .nav-salir:hover {
+            background: var(--color-primario) !important;
+            color: #ffffff !important;
         }
 
-        .landing h1 {
-            margin: 0 0 8px;
-            font-size: 2.1rem;
-        }
-
-        .landing p {
-            color: #c7ccd4;
-            font-size: 1.02rem;
-            max-width: 46em;
+        /* Contenedor Principal */
+        .contenedor {
+            max-width: 1140px;
+            width: 100%;
             margin: 0 auto;
+            padding: 36px 24px 60px;
+            flex: 1;
         }
 
-        .landing-acciones {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 26px;
-            flex-wrap: wrap;
-        }
-
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 28px;
-            text-align: left;
-        }
-
-        .tarjeta {
-            display: block;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-left: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            padding: 20px;
-            font-weight: 600;
-            color: #fff;
-            transition: transform var(--transicion), background var(--transicion), border-color var(--transicion);
-        }
-
-        .tarjeta:hover {
-            background: rgba(255, 255, 255, .12);
-            border-color: var(--color-primario);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-
-        /* Botones */
-        .boton {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radio-chico);
-            background: var(--color-primario);
-            color: #fff;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            box-shadow: var(--sombra);
-            transition: background var(--transicion), transform var(--transicion), box-shadow var(--transicion);
-        }
-
-        .boton:hover {
-            background: var(--color-primario-oscuro);
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--sombra-media);
-        }
-
-        .boton:active {
-            transform: translateY(0);
-        }
-
-        .boton-secundario {
-            background: transparent;
-            color: #fff;
-            border-color: rgba(255, 255, 255, .35);
-        }
-
-        .boton-secundario:hover {
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        /* Fuera del hero oscuro (paneles claros), el botón secundario usa tinta oscura */
-        .panel .boton-secundario,
-        .panel-cabecera .boton-secundario {
-            color: var(--color-primario-oscuro);
-            border-color: var(--color-borde);
-        }
-
-        .panel .boton-secundario:hover,
-        .panel-cabecera .boton-secundario:hover {
-            background: var(--color-primario-claro);
-            border-color: var(--color-primario);
-        }
-
-        .boton-peligro {
-            background: var(--color-peligro);
-        }
-
-        .boton-peligro:hover {
-            background: #8a1d17;
-        }
-
-        .boton-pequeno {
-            padding: 6px 12px;
-            font-size: 0.83rem;
-            box-shadow: none;
-        }
-
-        /* Tarjetas de contenido / formularios */
+        /* Panel Principal */
         .panel {
             background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            padding: 26px 28px;
-            margin-top: 24px;
-        }
-
-        .panel h1 {
-            font-size: 1.4rem;
-            margin: 0;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-lg);
+            box-shadow: var(--sombra-tarjeta);
+            padding: 36px 40px;
+            position: relative;
         }
 
         .panel-cabecera {
@@ -280,56 +177,94 @@ $datos = $datos ?? [];
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 16px;
+            margin-bottom: 26px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
         }
 
+        .panel-cabecera h1,
+        .panel > h1 {
+            font-size: 1.65rem;
+            color: var(--color-texto);
+        }
+
+        /* Botones */
+        .boton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: var(--radio-md);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
+            color: #ffffff;
+            font-size: 0.94rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--sombra-boton);
+            transition: var(--transicion);
+        }
+
+        .boton:hover {
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 62, 140, 0.35);
+        }
+
+        .boton-secundario {
+            background: var(--color-superficie);
+            color: var(--color-texto);
+            border: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .boton-secundario:hover {
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            border-color: var(--color-primario-borde);
+            transform: translateY(-2px);
+        }
+
+        /* Formularios */
         .formulario {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 560px;
+            gap: 22px;
+            margin-top: 10px;
         }
 
         .formulario-ancho {
-            max-width: none;
+            max-width: 820px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        /* El atributo HTML "hidden" necesita más especificidad que
-           ".campo { display: flex }" para ocultar el bloque de verdad. */
-        .campo[hidden] {
-            display: none;
+            gap: 8px;
         }
 
         .campo label {
             font-weight: 600;
             font-size: 0.88rem;
-            color: var(--color-secundario);
+            color: var(--color-texto);
         }
 
-        .campo input,
+        .campo input[type="text"],
+        .campo input[type="number"],
         .campo select,
         .campo textarea {
-            padding: 10px 12px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio-chico);
-            font-size: 0.95rem;
+            padding: 12px 14px;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            font-size: 0.94rem;
             font-family: inherit;
-            background: var(--color-superficie);
+            background: #ffffff;
             color: var(--color-texto);
-            transition: border-color var(--transicion), box-shadow var(--transicion);
-        }
-
-        .campo input:hover,
-        .campo select:hover,
-        .campo textarea:hover {
-            border-color: #cfc9bd;
+            transition: var(--transicion);
         }
 
         .campo input:focus,
@@ -337,12 +272,7 @@ $datos = $datos ?? [];
         .campo textarea:focus {
             outline: none;
             border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px var(--color-primario-claro);
-        }
-
-        .campo input:disabled {
-            background: #f2f1ed;
-            color: var(--color-texto-suave);
+            box-shadow: 0 0 0 4px var(--color-primario-suave);
         }
 
         .campo textarea {
@@ -351,238 +281,192 @@ $datos = $datos ?? [];
 
         .fila-formulario {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
+        }
+
+        /* Grid de Selección de Clientes */
+        .tarjetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .tarjeta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 20px;
+            background: #ffffff;
+            border: 1px solid var(--color-borde-suave);
+            border-left: 4px solid var(--color-primario-borde);
+            border-radius: var(--radio-md);
+            color: var(--color-texto);
+            font-weight: 600;
+            font-size: 0.96rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            transition: var(--transicion);
+        }
+
+        .tarjeta-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            border: 1px solid var(--color-primario-borde);
+        }
+
+        .tarjeta:hover {
+            border-color: var(--color-primario-borde);
+            border-left-color: var(--color-primario);
+            transform: translateY(-3px);
+            color: var(--color-primario-hover);
+            box-shadow: var(--sombra-tarjeta);
+            text-decoration: none;
+        }
+
+        .tarjeta:hover .tarjeta-avatar {
+            background: var(--color-primario);
+            color: #ffffff;
         }
 
         /* Tablas */
         .tabla-envoltura {
             overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio);
-            scrollbar-width: thin;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            background: #ffffff;
+            margin-top: 18px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--color-superficie);
-        }
-
-        th, td {
             text-align: left;
-            padding: 12px 14px;
-            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         th {
-            background: var(--color-oscuro);
-            color: #fff;
+            background: #faf4f7;
+            color: var(--color-texto-suave);
             font-weight: 700;
             font-size: 0.78rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 0.92rem;
+            color: var(--color-texto);
+            border-bottom: 1px solid var(--color-borde-suave);
+            vertical-align: middle;
         }
 
         tbody tr {
-            border-bottom: 1px solid var(--color-borde);
-            transition: background var(--transicion);
+            transition: var(--transicion);
         }
 
-        tbody tr:last-child {
+        tbody tr:last-child td {
             border-bottom: none;
         }
 
-        tbody tr:nth-child(even) {
-            background: #faf9f6;
-        }
-
         tbody tr:hover {
-            background: var(--color-primario-claro);
+            background: var(--color-primario-suave);
         }
 
-        td .acciones {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        .badge-dato {
+            display: inline-block;
+            background: var(--color-primario-suave);
+            color: var(--color-primario-hover);
+            border: 1px solid var(--color-primario-borde);
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
         }
 
-        /* Mensajes / alertas */
+        /* Alertas */
         .alerta {
-            padding: 12px 16px;
-            border-radius: var(--radio-chico);
-            margin-bottom: 16px;
+            padding: 14px 18px;
+            border-radius: var(--radio-md);
+            margin-bottom: 22px;
             font-size: 0.92rem;
-            border-left: 3px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alerta-error {
             background: var(--color-peligro-claro);
             color: var(--color-peligro);
-            border-left-color: var(--color-peligro);
+            border: 1px solid var(--color-peligro-borde);
         }
 
-        .alerta-error::before {
-            content: "⚠ ";
-        }
-
-        .alerta-exito {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-            border-left-color: var(--color-exito);
-        }
-
-        .alerta-exito::before {
-            content: "✓ ";
-        }
-
-        /* Insignias de estado */
-        .insignia {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .insignia::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .insignia-activo {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-        }
-
-        .insignia-inactivo {
-            background: #f0efeb;
+        .texto-suave {
             color: var(--color-texto-suave);
+            font-size: 0.95rem;
         }
 
-        .insignia-rol {
-            background: var(--color-primario-claro);
-            color: var(--color-primario-oscuro);
-        }
-
-        /* Páginas de error */
-        .error-pagina {
-            text-align: center;
-            padding: 72px 20px;
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            margin-top: 24px;
-        }
-
-        .error-pagina h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-        }
-
-        .error-pagina p {
-            color: var(--color-texto-suave);
-            margin-bottom: 20px;
-        }
-
-        /* Auth (login/registro) */
-        .auth-panel {
-            max-width: 420px;
-            margin: 56px auto;
-            border-top: 3px solid var(--color-primario);
-        }
-
-        .auth-panel h1 {
-            font-size: 1.4rem;
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .auth-pie {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
-            color: var(--color-texto-suave);
+        .espacio-superior {
+            margin-top: 18px;
         }
 
         /* Pie de página */
         .pie {
-            margin-top: 40px;
-            padding: 20px 16px 36px;
+            margin-top: auto;
+            padding: 26px;
             text-align: center;
             color: var(--color-texto-suave);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--color-borde-suave);
+            background: rgba(255, 255, 255, 0.7);
         }
 
-        /* Utilidades */
-        .texto-suave {
-            color: var(--color-texto-suave);
-        }
-
-        .espacio-superior {
-            margin-top: 16px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 640px) {
-            .contenedor {
-                padding: 20px 14px 40px;
-            }
-
+        @media (max-width: 768px) {
             .nav {
-                padding: 12px 16px;
+                padding: 14px 20px;
             }
-
-            .landing {
-                padding: 32px 22px;
-            }
-
-            .landing h1 {
-                font-size: 1.7rem;
-            }
-
-            .landing-acciones {
-                flex-direction: column;
-            }
-
-            .landing-acciones .boton {
-                width: 100%;
-                justify-content: center;
-            }
-
             .panel {
-                padding: 20px;
+                padding: 24px 18px;
             }
-
-            .auth-panel {
-                margin: 24px auto;
+            .fila-formulario {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+
 <nav class="nav">
-    <span class="nav-marca">Gimnasio</span>
+    <div class="nav-marca">
+        <span class="nav-marca-icono">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+        </span>
+        Gimnasio
+    </div>
     <div class="nav-enlaces">
         <a href="<?= url('login') ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
             <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
             <a href="<?= url('ejercicio') ?>">Ejercicios</a>
-            <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
+            <a href="<?= url('evaluacionFisica', 'registrar') ?>" class="<?= $accion === 'registrar' ? 'activo' : '' ?>">Registrar evaluación</a>
             <a href="<?= url('rutina') ?>">Rutinas</a>
         <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
             <a href="<?= url('rutina') ?>">Mis rutinas</a>
-            <a href="<?= url('evaluacionFisica', 'historial') ?>">Mis evaluaciones</a>
+            <a href="<?= url('evaluacionFisica', 'historial') ?>" class="activo">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
@@ -590,20 +474,26 @@ $datos = $datos ?? [];
         <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
+
 <main class="contenedor">
 
 <?php if ($accion === 'registrar'): ?>
 
     <section class="panel">
-        <h1>Registrar evaluación física</h1>
+        <div class="panel-cabecera">
+            <h1>Registrar Evaluación Física</h1>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario formulario-ancho" method="post" action="<?= url('evaluacionFisica', 'guardar') ?>">
             <div class="campo">
-                <label for="id_cliente">Cliente</label>
+                <label for="id_cliente">Cliente a evaluar</label>
                 <select id="id_cliente" name="id_cliente" required>
                     <option value="">Selecciona un cliente</option>
                     <?php foreach ($clientes as $cliente): ?>
@@ -613,39 +503,46 @@ $datos = $datos ?? [];
                     <?php endforeach; ?>
                 </select>
             </div>
+
             <div class="fila-formulario">
                 <div class="campo">
-                    <label for="peso">Peso (kg)</label>
-                    <input type="number" step="0.01" id="peso" name="peso" value="<?= e($datos['peso'] ?? '') ?>" required>
+                    <label for="peso">Peso corporal (kg)</label>
+                    <input type="number" step="0.01" id="peso" name="peso" placeholder="Ej: 72.50" value="<?= e($datos['peso'] ?? '') ?>" required>
                 </div>
                 <div class="campo">
-                    <label for="altura">Altura (m)</label>
-                    <input type="number" step="0.01" id="altura" name="altura" value="<?= e($datos['altura'] ?? '') ?>" required>
+                    <label for="altura">Estatura / Altura (m)</label>
+                    <input type="number" step="0.01" id="altura" name="altura" placeholder="Ej: 1.75" value="<?= e($datos['altura'] ?? '') ?>" required>
                 </div>
             </div>
+
             <div class="fila-formulario">
                 <div class="campo">
-                    <label for="porcentaje_grasa">% de grasa corporal</label>
-                    <input type="number" step="0.01" id="porcentaje_grasa" name="porcentaje_grasa" value="<?= e($datos['porcentaje_grasa'] ?? '') ?>">
+                    <label for="porcentaje_grasa">% Grasa corporal</label>
+                    <input type="number" step="0.01" id="porcentaje_grasa" name="porcentaje_grasa" placeholder="Ej: 16.5" value="<?= e($datos['porcentaje_grasa'] ?? '') ?>">
                 </div>
                 <div class="campo">
                     <label for="masa_muscular">Masa muscular (kg)</label>
-                    <input type="number" step="0.01" id="masa_muscular" name="masa_muscular" value="<?= e($datos['masa_muscular'] ?? '') ?>">
+                    <input type="number" step="0.01" id="masa_muscular" name="masa_muscular" placeholder="Ej: 34.2" value="<?= e($datos['masa_muscular'] ?? '') ?>">
                 </div>
                 <div class="campo">
                     <label for="flexibilidad">Flexibilidad (cm)</label>
-                    <input type="number" step="0.01" id="flexibilidad" name="flexibilidad" value="<?= e($datos['flexibilidad'] ?? '') ?>">
+                    <input type="number" step="0.01" id="flexibilidad" name="flexibilidad" placeholder="Ej: 5.0" value="<?= e($datos['flexibilidad'] ?? '') ?>">
                 </div>
             </div>
+
             <div class="campo">
-                <label for="objetivo">Objetivo</label>
-                <input type="text" id="objetivo" name="objetivo" value="<?= e($datos['objetivo'] ?? '') ?>">
+                <label for="objetivo">Objetivo principal</label>
+                <input type="text" id="objetivo" name="objetivo" placeholder="Ej: Hipertrofia, recomposición corporal, pérdida de grasa..." value="<?= e($datos['objetivo'] ?? '') ?>">
             </div>
+
             <div class="campo">
-                <label for="observaciones">Observaciones</label>
-                <textarea id="observaciones" name="observaciones" rows="3"><?= e($datos['observaciones'] ?? '') ?></textarea>
+                <label for="observaciones">Observaciones y notas adicionales</label>
+                <textarea id="observaciones" name="observaciones" rows="3" placeholder="Comentarios clínicos, antecedentes de lesiones o indicaciones dietéticas..."><?= e($datos['observaciones'] ?? '') ?></textarea>
             </div>
-            <button type="submit" class="boton">Guardar evaluación</button>
+
+            <div style="margin-top: 8px;">
+                <button type="submit" class="boton">Guardar evaluación</button>
+            </div>
         </form>
     </section>
 
@@ -653,27 +550,34 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <?php if ($clientes === null): ?>
-            <h1>Mi historial de evaluaciones</h1>
+            <div class="panel-cabecera">
+                <h1>Mi Historial de Evaluaciones</h1>
+            </div>
         <?php elseif ($clienteSeleccionado === null): ?>
-            <h1>Historial de evaluaciones</h1>
-            <p class="texto-suave">Selecciona un cliente para ver su historial.</p>
+            <div class="panel-cabecera">
+                <div>
+                    <h1>Historial de Evaluaciones</h1>
+                    <p class="texto-suave">Selecciona un cliente para consultar su progreso y mediciones históricas.</p>
+                </div>
+            </div>
             <div class="tarjetas">
                 <?php foreach ($clientes as $cliente): ?>
                     <a class="tarjeta" href="<?= url('evaluacionFisica', 'historial', ['id' => $cliente['id_usuario']]) ?>">
-                        <?= e($cliente['nombres'] . ' ' . $cliente['apellidos']) ?>
+                        <span class="tarjeta-avatar"><?= mb_substr($cliente['nombres'], 0, 1) ?></span>
+                        <span><?= e($cliente['nombres'] . ' ' . $cliente['apellidos']) ?></span>
                     </a>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="panel-cabecera">
-                <h1>Historial de <?= e($clienteSeleccionado['nombres'] . ' ' . $clienteSeleccionado['apellidos']) ?></h1>
-                <a class="boton boton-secundario" href="<?= url('evaluacionFisica', 'historial') ?>">Elegir otro cliente</a>
+                <h1>Historial: <?= e($clienteSeleccionado['nombres'] . ' ' . $clienteSeleccionado['apellidos']) ?></h1>
+                <a class="boton boton-secundario" href="<?= url('evaluacionFisica', 'historial') ?>">← Elegir otro cliente</a>
             </div>
         <?php endif; ?>
 
         <?php if ($clientes === null || $clienteSeleccionado !== null): ?>
             <?php if (empty($evaluaciones)): ?>
-                <p class="texto-suave espacio-superior">Todavía no hay evaluaciones registradas.</p>
+                <p class="texto-suave espacio-superior">Todavía no hay registros de evaluaciones para este perfil.</p>
             <?php else: ?>
                 <div class="tabla-envoltura">
                     <table>
@@ -686,20 +590,22 @@ $datos = $datos ?? [];
                                 <th>Masa muscular</th>
                                 <th>Flexibilidad</th>
                                 <th>Objetivo</th>
-                                <th>Instructor</th>
+                                <th>Evaluador</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($evaluaciones as $evaluacion): ?>
                                 <tr>
-                                    <td><?= e($evaluacion['fecha']) ?></td>
-                                    <td><?= e($evaluacion['peso']) ?> kg</td>
+                                    <td style="font-weight: 600;"><?= e($evaluacion['fecha']) ?></td>
+                                    <td><span class="badge-dato"><?= e($evaluacion['peso']) ?> kg</span></td>
                                     <td><?= e($evaluacion['altura']) ?> m</td>
-                                    <td><?= e($evaluacion['porcentaje_grasa'] ?? '-') ?></td>
-                                    <td><?= e($evaluacion['masa_muscular'] ?? '-') ?></td>
-                                    <td><?= e($evaluacion['flexibilidad'] ?? '-') ?></td>
-                                    <td><?= e($evaluacion['objetivo'] ?? '-') ?></td>
-                                    <td><?= e($evaluacion['instructor_nombres'] . ' ' . $evaluacion['instructor_apellidos']) ?></td>
+                                    <td><?= !empty($evaluacion['porcentaje_grasa']) ? e($evaluacion['porcentaje_grasa']) . '%' : '-' ?></td>
+                                    <td><?= !empty($evaluacion['masa_muscular']) ? e($evaluacion['masa_muscular']) . ' kg' : '-' ?></td>
+                                    <td><?= !empty($evaluacion['flexibilidad']) ? e($evaluacion['flexibilidad']) . ' cm' : '-' ?></td>
+                                    <td style="color: var(--color-texto-suave);"><?= e($evaluacion['objetivo'] ?? '-') ?></td>
+                                    <td style="font-size: 0.88rem; color: var(--color-texto); font-weight: 500;">
+                                        <?= e($evaluacion['instructor_nombres'] . ' ' . $evaluacion['instructor_apellidos']) ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -712,8 +618,10 @@ $datos = $datos ?? [];
 <?php endif; ?>
 
 </main>
+
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio</p>
+    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
+
 </body>
 </html>

@@ -11,268 +11,166 @@ $datos = $datos ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Gimnasio</title>
+    <title>Gestión de Rutinas - Sistema de Gimnasio</title>
+    <!-- Tipografía profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primario: #d9782e;
-            --color-primario-oscuro: #a85820;
-            --color-primario-claro: #fbe9d9;
-            --color-oscuro: #21242b;
-            --color-oscuro-2: #2d323b;
-            --color-secundario: #58626c;
-            --color-fondo: #f6f5f2;
+            /* Paleta Rosa Claro & Sofisticada */
+            --color-primario: #e83e8c;
+            --color-primario-hover: #d62575;
+            --color-primario-suave: #fdf2f6;
+            --color-primario-borde: #fcc2d7;
+            --color-acento: #ff6b8b;
+            
+            /* Fondos y Neutros Claros */
+            --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
-            --color-borde: #e6e2da;
-            --color-texto: #24211c;
-            --color-texto-suave: #6c6459;
-            --color-peligro: #c0362c;
-            --color-peligro-claro: #fbebea;
-            --color-exito: #2f8a4e;
-            --color-exito-claro: #e8f5ec;
-            --radio: 10px;
-            --radio-chico: 6px;
-            --sombra: 0 1px 2px rgba(20, 15, 10, .08);
-            --sombra-media: 0 14px 30px -12px rgba(20, 15, 10, .3);
-            --transicion: 150ms ease;
+            --color-borde-suave: #f1e4e8;
+            
+            /* Textos */
+            --color-texto: #2d242a;
+            --color-texto-suave: #796670;
+            --color-texto-mutado: #a89aa1;
+            
+            /* Estados */
+            --color-peligro: #ef4444;
+            --color-peligro-claro: #fef2f2;
+            --color-peligro-borde: #fecaca;
+            --color-exito: #10b981;
+            --color-exito-claro: #ecfdf5;
+            --color-exito-borde: #a7f3d0;
+
+            /* Radios y Sombras */
+            --radio-lg: 20px;
+            --radio-md: 12px;
+            --radio-sm: 8px;
+            --sombra-suave: 0 4px 20px -2px rgba(232, 62, 140, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --sombra-tarjeta: 0 12px 32px -4px rgba(232, 62, 140, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            --sombra-boton: 0 6px 18px rgba(232, 62, 140, 0.25);
+            --transicion: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--color-fondo);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #fdf6f8 0%, var(--color-fondo) 100%);
             color: var(--color-texto);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1, h2, h3 {
+            font-weight: 700;
+            color: var(--color-texto);
             line-height: 1.25;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
 
         a {
-            color: var(--color-primario-oscuro);
-            text-decoration: none;
-            transition: color var(--transicion);
-        }
-
-        a:hover {
             color: var(--color-primario);
-            text-decoration: underline;
+            text-decoration: none;
+            transition: var(--transicion);
         }
 
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid var(--color-primario);
-            outline-offset: 2px;
-        }
-
-        .contenedor {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 20px 56px;
-        }
-
-        /* Navegación */
+        /* Barra de Navegación */
         .nav {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--color-oscuro);
-            border-bottom: 3px solid var(--color-primario);
-            padding: 14px 24px;
-            box-shadow: var(--sombra-media);
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
         .nav-marca {
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-texto);
             font-weight: 800;
             font-size: 1.15rem;
-            letter-spacing: -0.01em;
-            margin-right: 16px;
+            letter-spacing: -0.02em;
         }
 
-        .nav-marca::before {
-            content: "🏋 ";
+        .nav-marca-icono {
+            background: linear-gradient(135deg, #ff85a1 0%, var(--color-primario) 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(232, 62, 140, 0.25);
         }
 
         .nav-enlaces {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .nav a {
-            color: #c7ccd4;
-            font-size: 0.94rem;
-            font-weight: 500;
-            padding: 4px 2px;
-            border-bottom: 2px solid transparent;
+            color: var(--color-texto-suave);
+            font-size: 0.92rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radio-sm);
         }
 
-        .nav a:hover {
-            color: #fff;
+        .nav a:hover,
+        .nav a.activo {
+            color: var(--color-primario);
+            background: var(--color-primario-suave);
             text-decoration: none;
-            border-bottom-color: var(--color-primario);
         }
 
         .nav-salir {
-            color: #fff;
-            font-weight: 600;
+            color: var(--color-primario) !important;
+            background: var(--color-primario-suave) !important;
+            border: 1px solid var(--color-primario-borde);
         }
 
-        /* Landing / dashboard: banda oscura tipo "hero" */
-        .landing {
-            background: linear-gradient(135deg, var(--color-oscuro), var(--color-oscuro-2));
-            color: #fff;
-            border-radius: var(--radio);
-            box-shadow: var(--sombra-media);
-            padding: 48px 36px;
-            text-align: center;
+        .nav-salir:hover {
+            background: var(--color-primario) !important;
+            color: #ffffff !important;
         }
 
-        .landing h1 {
-            margin: 0 0 8px;
-            font-size: 2.1rem;
-        }
-
-        .landing p {
-            color: #c7ccd4;
-            font-size: 1.02rem;
-            max-width: 46em;
+        /* Contenedor Principal */
+        .contenedor {
+            max-width: 1140px;
+            width: 100%;
             margin: 0 auto;
+            padding: 36px 24px 60px;
+            flex: 1;
         }
 
-        .landing-acciones {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 26px;
-            flex-wrap: wrap;
-        }
-
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 28px;
-            text-align: left;
-        }
-
-        .tarjeta {
-            display: block;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-left: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            padding: 20px;
-            font-weight: 600;
-            color: #fff;
-            transition: transform var(--transicion), background var(--transicion), border-color var(--transicion);
-        }
-
-        .tarjeta:hover {
-            background: rgba(255, 255, 255, .12);
-            border-color: var(--color-primario);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-
-        /* Botones */
-        .boton {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radio-chico);
-            background: var(--color-primario);
-            color: #fff;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            box-shadow: var(--sombra);
-            transition: background var(--transicion), transform var(--transicion), box-shadow var(--transicion);
-        }
-
-        .boton:hover {
-            background: var(--color-primario-oscuro);
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--sombra-media);
-        }
-
-        .boton:active {
-            transform: translateY(0);
-        }
-
-        .boton-secundario {
-            background: transparent;
-            color: #fff;
-            border-color: rgba(255, 255, 255, .35);
-        }
-
-        .boton-secundario:hover {
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        /* Fuera del hero oscuro (paneles claros), el botón secundario usa tinta oscura */
-        .panel .boton-secundario,
-        .panel-cabecera .boton-secundario {
-            color: var(--color-primario-oscuro);
-            border-color: var(--color-borde);
-        }
-
-        .panel .boton-secundario:hover,
-        .panel-cabecera .boton-secundario:hover {
-            background: var(--color-primario-claro);
-            border-color: var(--color-primario);
-        }
-
-        .boton-peligro {
-            background: var(--color-peligro);
-        }
-
-        .boton-peligro:hover {
-            background: #8a1d17;
-        }
-
-        .boton-pequeno {
-            padding: 6px 12px;
-            font-size: 0.83rem;
-            box-shadow: none;
-        }
-
-        /* Tarjetas de contenido / formularios */
+        /* Panel Principal */
         .panel {
             background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            padding: 26px 28px;
-            margin-top: 24px;
-        }
-
-        .panel h1 {
-            font-size: 1.4rem;
-            margin: 0;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-lg);
+            box-shadow: var(--sombra-tarjeta);
+            padding: 36px 40px;
+            position: relative;
         }
 
         .panel-cabecera {
@@ -280,174 +178,111 @@ $datos = $datos ?? [];
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .formulario {
-            display: flex;
-            flex-direction: column;
             gap: 16px;
-            max-width: 560px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
         }
 
-        .formulario-ancho {
-            max-width: none;
+        .panel-cabecera h1,
+        .panel > h1 {
+            font-size: 1.65rem;
+            color: var(--color-texto);
         }
 
-        .campo {
+        /* Subtarjeta / Sección Destacada */
+        .subseccion-tarjeta {
+            background: #fdfbfb;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            padding: 24px;
+            margin-top: 26px;
+        }
+
+        .subseccion-tarjeta-rosa {
+            background: var(--color-primario-suave);
+            border-color: var(--color-primario-borde);
+        }
+
+        .subseccion-titulo {
+            font-size: 1.15rem;
+            color: var(--color-texto);
+            margin-bottom: 14px;
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* El atributo HTML "hidden" necesita más especificidad que
-           ".campo { display: flex }" para ocultar el bloque de verdad. */
-        .campo[hidden] {
-            display: none;
-        }
-
-        .campo label {
+        /* Botones */
+        .boton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radio-md);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
+            color: #ffffff;
+            font-size: 0.92rem;
             font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--color-secundario);
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--sombra-boton);
+            transition: var(--transicion);
         }
 
-        .campo input,
-        .campo select,
-        .campo textarea {
-            padding: 10px 12px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio-chico);
-            font-size: 0.95rem;
-            font-family: inherit;
+        .boton:hover {
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 62, 140, 0.35);
+        }
+
+        .boton-secundario {
             background: var(--color-superficie);
             color: var(--color-texto);
-            transition: border-color var(--transicion), box-shadow var(--transicion);
+            border: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
-        .campo input:hover,
-        .campo select:hover,
-        .campo textarea:hover {
-            border-color: #cfc9bd;
+        .boton-secundario:hover {
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            border-color: var(--color-primario-borde);
+            transform: translateY(-2px);
         }
 
-        .campo input:focus,
-        .campo select:focus,
-        .campo textarea:focus {
-            outline: none;
-            border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px var(--color-primario-claro);
+        .boton-peligro {
+            background: var(--color-peligro);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
 
-        .campo input:disabled {
-            background: #f2f1ed;
-            color: var(--color-texto-suave);
+        .boton-peligro:hover {
+            background: #dc2626;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
         }
 
-        .campo textarea {
-            resize: vertical;
+        .boton-pequeno {
+            padding: 6px 14px;
+            font-size: 0.84rem;
+            border-radius: var(--radio-sm);
         }
 
-        .fila-formulario {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        /* Tablas */
-        .tabla-envoltura {
-            overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio);
-            scrollbar-width: thin;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--color-superficie);
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px 14px;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: var(--color-oscuro);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--color-borde);
-            transition: background var(--transicion);
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #faf9f6;
-        }
-
-        tbody tr:hover {
-            background: var(--color-primario-claro);
-        }
-
-        td .acciones {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        /* Mensajes / alertas */
-        .alerta {
-            padding: 12px 16px;
-            border-radius: var(--radio-chico);
-            margin-bottom: 16px;
-            font-size: 0.92rem;
-            border-left: 3px solid transparent;
-        }
-
-        .alerta-error {
-            background: var(--color-peligro-claro);
-            color: var(--color-peligro);
-            border-left-color: var(--color-peligro);
-        }
-
-        .alerta-error::before {
-            content: "⚠ ";
-        }
-
-        .alerta-exito {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-            border-left-color: var(--color-exito);
-        }
-
-        .alerta-exito::before {
-            content: "✓ ";
-        }
-
-        /* Insignias de estado */
+        /* Insignias de Estado */
         .insignia {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
+            gap: 6px;
+            padding: 4px 12px;
             border-radius: 999px;
-            font-size: 0.76rem;
+            font-size: 0.78rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .insignia::before {
@@ -458,130 +293,230 @@ $datos = $datos ?? [];
             background: currentColor;
         }
 
-        .insignia-activo {
+        .insignia-activa {
             background: var(--color-exito-claro);
             color: var(--color-exito);
+            border: 1px solid var(--color-exito-borde);
         }
 
-        .insignia-inactivo {
-            background: #f0efeb;
+        .insignia-completada {
+            background: var(--color-primario-suave);
+            color: var(--color-primario-hover);
+            border: 1px solid var(--color-primario-borde);
+        }
+
+        .insignia-cancelada {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Tablas */
+        .tabla-envoltura {
+            overflow-x: auto;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            background: #ffffff;
+            margin-top: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #faf4f7;
             color: var(--color-texto-suave);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
         }
 
-        .insignia-rol {
-            background: var(--color-primario-claro);
-            color: var(--color-primario-oscuro);
+        td {
+            padding: 14px 18px;
+            font-size: 0.92rem;
+            color: var(--color-texto);
+            border-bottom: 1px solid var(--color-borde-suave);
+            vertical-align: middle;
         }
 
-        /* Páginas de error */
-        .error-pagina {
-            text-align: center;
-            padding: 72px 20px;
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            margin-top: 24px;
+        tbody tr {
+            transition: var(--transicion);
         }
 
-        .error-pagina h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
+        tbody tr:last-child td {
+            border-bottom: none;
         }
 
-        .error-pagina p {
-            color: var(--color-texto-suave);
+        tbody tr:hover {
+            background: var(--color-primario-suave);
+        }
+
+        td .acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Formularios */
+        .formulario {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 10px;
+            max-width: 680px;
+        }
+
+        .formulario-full {
+            max-width: none;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .campo label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--color-texto);
+        }
+
+        .campo input[type="text"],
+        .campo input[type="date"],
+        .campo input[type="number"],
+        .campo select {
+            padding: 11px 14px;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            font-size: 0.94rem;
+            font-family: inherit;
+            background: #ffffff;
+            color: var(--color-texto);
+            transition: var(--transicion);
+        }
+
+        .campo input:focus,
+        .campo select:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 4px var(--color-primario-suave);
+        }
+
+        .fila-formulario {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        /* Metadatos / Grid de Resumen en Vista 'Ver' */
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .resumen-card {
+            background: #faf7f8;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            padding: 14px 18px;
+        }
+
+        .resumen-card strong {
+            display: block;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-primario);
+            margin-bottom: 4px;
+        }
+
+        .resumen-card span {
+            font-size: 0.96rem;
+            font-weight: 600;
+            color: var(--color-texto);
+        }
+
+        /* Alertas */
+        .alerta {
+            padding: 14px 18px;
+            border-radius: var(--radio-md);
             margin-bottom: 20px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Auth (login/registro) */
-        .auth-panel {
-            max-width: 420px;
-            margin: 56px auto;
-            border-top: 3px solid var(--color-primario);
+        .alerta-error {
+            background: var(--color-peligro-claro);
+            color: var(--color-peligro);
+            border: 1px solid var(--color-peligro-borde);
         }
 
-        .auth-panel h1 {
-            font-size: 1.4rem;
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .auth-pie {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
+        .texto-suave {
             color: var(--color-texto-suave);
+            font-size: 0.94rem;
+        }
+
+        .espacio-superior {
+            margin-top: 24px;
         }
 
         /* Pie de página */
         .pie {
-            margin-top: 40px;
-            padding: 20px 16px 36px;
+            margin-top: auto;
+            padding: 26px;
             text-align: center;
             color: var(--color-texto-suave);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--color-borde-suave);
+            background: rgba(255, 255, 255, 0.7);
         }
 
-        /* Utilidades */
-        .texto-suave {
-            color: var(--color-texto-suave);
-        }
-
-        .espacio-superior {
-            margin-top: 16px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 640px) {
-            .contenedor {
-                padding: 20px 14px 40px;
-            }
-
+        @media (max-width: 768px) {
             .nav {
-                padding: 12px 16px;
+                padding: 14px 20px;
             }
-
-            .landing {
-                padding: 32px 22px;
-            }
-
-            .landing h1 {
-                font-size: 1.7rem;
-            }
-
-            .landing-acciones {
-                flex-direction: column;
-            }
-
-            .landing-acciones .boton {
-                width: 100%;
-                justify-content: center;
-            }
-
             .panel {
-                padding: 20px;
+                padding: 24px 18px;
             }
-
-            .auth-panel {
-                margin: 24px auto;
+            .fila-formulario {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+
+<?php if ($usuarioSesion): ?>
 <nav class="nav">
-    <span class="nav-marca">Gimnasio</span>
+    <div class="nav-marca">
+        <span class="nav-marca-icono">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+        </span>
+        Gimnasio
+    </div>
     <div class="nav-enlaces">
         <a href="<?= url('login') ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
             <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
             <a href="<?= url('ejercicio') ?>">Ejercicios</a>
             <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-            <a href="<?= url('rutina') ?>">Rutinas</a>
+            <a href="<?= url('rutina') ?>" class="activo">Rutinas</a>
         <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-            <a href="<?= url('rutina') ?>">Mis rutinas</a>
+            <a href="<?= url('rutina') ?>" class="activo">Mis rutinas</a>
             <a href="<?= url('evaluacionFisica', 'historial') ?>">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
@@ -590,15 +525,19 @@ $datos = $datos ?? [];
         <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
+<?php endif; ?>
+
 <main class="contenedor">
 
 <?php if ($accion === 'listar'): ?>
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1><?= $rol === 'instructor' ? 'Rutinas creadas' : 'Mis rutinas asignadas' ?></h1>
+            <h1><?= $rol === 'instructor' ? 'Rutinas Creadas' : 'Mis Rutinas de Entrenamiento' ?></h1>
             <?php if ($rol === 'instructor'): ?>
-                <a class="boton" href="<?= url('rutina', 'crear') ?>">Nueva rutina</a>
+                <a class="boton" href="<?= url('rutina', 'crear') ?>">
+                    <span>+ Nueva rutina</span>
+                </a>
             <?php endif; ?>
         </div>
 
@@ -611,32 +550,40 @@ $datos = $datos ?? [];
                         <tr>
                             <th>Nombre</th>
                             <th>Tipo</th>
-                            <th><?= $rol === 'instructor' ? 'Cliente' : 'Instructor' ?></th>
+                            <th><?= $rol === 'instructor' ? 'Cliente' : 'Instructor Asignado' ?></th>
                             <th>Inicio</th>
                             <th>Fin</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th style="text-align: right;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($rutinas as $rutina): ?>
+                        <?php foreach ($rutinas as $rutina): 
+                            $claseEstado = match(strtolower($rutina['estado'])) {
+                                'activa' => 'insignia-activa',
+                                'completada' => 'insignia-completada',
+                                default => 'insignia-cancelada'
+                            };
+                        ?>
                             <tr>
-                                <td><?= e($rutina['nombre']) ?></td>
-                                <td><?= e($rutina['tipo'] ?? '-') ?></td>
-                                <td>
+                                <td style="font-weight: 600; color: var(--color-texto);"><?= e($rutina['nombre']) ?></td>
+                                <td style="color: var(--color-texto-suave);"><?= e($rutina['tipo'] ?? '-') ?></td>
+                                <td style="font-weight: 500;">
                                     <?= $rol === 'instructor'
                                         ? e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos'])
                                         : e($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']) ?>
                                 </td>
                                 <td><?= e($rutina['fecha_inicio']) ?></td>
-                                <td><?= e($rutina['fecha_fin'] ?? '-') ?></td>
-                                <td><span class="insignia insignia-rol"><?= e(ucfirst($rutina['estado'])) ?></span></td>
-                                <td class="acciones">
-                                    <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver</a>
-                                    <?php if ($rol === 'instructor'): ?>
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'editar', ['id' => $rutina['id_rutina']]) ?>">Editar</a>
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Ejercicios</a>
-                                    <?php endif; ?>
+                                <td><?= e($rutina['fecha_fin'] ?? 'Indefinida') ?></td>
+                                <td><span class="insignia <?= $claseEstado ?>"><?= e(ucfirst($rutina['estado'])) ?></span></td>
+                                <td>
+                                    <div class="acciones" style="justify-content: flex-end;">
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver</a>
+                                        <?php if ($rol === 'instructor'): ?>
+                                            <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'editar', ['id' => $rutina['id_rutina']]) ?>">Editar</a>
+                                            <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Ejercicios</a>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -650,44 +597,81 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1><?= e($rutina['nombre']) ?></h1>
-            <?php if ((int) $rutina['id_instructor'] === (int) $_SESSION['user']['id']): ?>
-                <a class="boton boton-secundario" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Gestionar ejercicios</a>
-            <?php endif; ?>
+            <div>
+                <h1><?= e($rutina['nombre']) ?></h1>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+                <?php if ((int) $rutina['id_instructor'] === (int) ($_SESSION['user']['id'] ?? 0)): ?>
+                    <a class="boton" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Gestionar ejercicios</a>
+                <?php endif; ?>
+            </div>
         </div>
 
-        <p><strong>Cliente:</strong> <?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></p>
-        <p><strong>Instructor:</strong> <?= e($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']) ?></p>
-        <p><strong>Tipo:</strong> <?= e($rutina['tipo'] ?? '-') ?></p>
-        <p><strong>Periodo:</strong> <?= e($rutina['fecha_inicio']) ?> &mdash; <?= e($rutina['fecha_fin'] ?? 'sin definir') ?></p>
-        <p><strong>Estado:</strong> <span class="insignia insignia-rol"><?= e(ucfirst($rutina['estado'])) ?></span></p>
+        <?php 
+            $claseEstado = match(strtolower($rutina['estado'])) {
+                'activa' => 'insignia-activa',
+                'completada' => 'insignia-completada',
+                default => 'insignia-cancelada'
+            };
+        ?>
+
+        <div class="resumen-grid">
+            <div class="resumen-card">
+                <strong>Cliente</strong>
+                <span><?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></span>
+            </div>
+            <div class="resumen-card">
+                <strong>Instructor</strong>
+                <span><?= e($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']) ?></span>
+            </div>
+            <div class="resumen-card">
+                <strong>Enfoque / Tipo</strong>
+                <span><?= e($rutina['tipo'] ?? 'General') ?></span>
+            </div>
+            <div class="resumen-card">
+                <strong>Periodo</strong>
+                <span><?= e($rutina['fecha_inicio']) ?> al <?= e($rutina['fecha_fin'] ?? 'indefinido') ?></span>
+            </div>
+            <div class="resumen-card">
+                <strong>Estado actual</strong>
+                <div>
+                    <span class="insignia <?= $claseEstado ?>"><?= e(ucfirst($rutina['estado'])) ?></span>
+                </div>
+            </div>
+        </div>
 
         <?php if (empty($detallePorDia)): ?>
-            <p class="texto-suave espacio-superior">Esta rutina todavía no tiene ejercicios asignados.</p>
+            <p class="texto-suave espacio-superior">Esta rutina todavía no tiene ejercicios organizados por día.</p>
         <?php else: ?>
             <?php foreach ($detallePorDia as $dia => $ejercicios): ?>
-                <h2 class="espacio-superior"><?= e($dia) ?></h2>
-                <div class="tabla-envoltura">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ejercicio</th>
-                                <th>Series</th>
-                                <th>Repeticiones</th>
-                                <th>Descanso (s)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($ejercicios as $fila): ?>
+                <div class="subseccion-tarjeta">
+                    <h2 class="subseccion-titulo">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primario);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <?= e($dia) ?>
+                    </h2>
+                    <div class="tabla-envoltura" style="margin-top: 0;">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td><?= e($fila['ejercicio_nombre']) ?></td>
-                                    <td><?= e($fila['series']) ?></td>
-                                    <td><?= e($fila['repeticiones']) ?></td>
-                                    <td><?= e($fila['tiempo_descanso']) ?></td>
+                                    <th>Ejercicio</th>
+                                    <th>Series</th>
+                                    <th>Repeticiones</th>
+                                    <th>Descanso entre series</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($ejercicios as $fila): ?>
+                                    <tr>
+                                        <td style="font-weight: 600;"><?= e($fila['ejercicio_nombre']) ?></td>
+                                        <td><?= e($fila['series']) ?></td>
+                                        <td><?= e($fila['repeticiones']) ?></td>
+                                        <td><span style="font-weight: 600; color: var(--color-primario);"><?= e($fila['tiempo_descanso']) ?>s</span></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -696,15 +680,21 @@ $datos = $datos ?? [];
 <?php elseif ($accion === 'crear'): ?>
 
     <section class="panel">
-        <h1>Nueva rutina</h1>
+        <div class="panel-cabecera">
+            <h1>Nueva Rutina</h1>
+            <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario" method="post" action="<?= url('rutina', 'guardar') ?>">
             <div class="campo">
-                <label for="id_cliente">Cliente</label>
+                <label for="id_cliente">Asignar a cliente</label>
                 <select id="id_cliente" name="id_cliente" required>
                     <option value="">Selecciona un cliente</option>
                     <?php foreach ($clientes as $cliente): ?>
@@ -715,12 +705,12 @@ $datos = $datos ?? [];
                 </select>
             </div>
             <div class="campo">
-                <label for="nombre">Nombre de la rutina</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" required>
+                <label for="nombre">Nombre descriptivo de la rutina</label>
+                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" placeholder="Ej: Torso - Pierna 4 días" required>
             </div>
             <div class="campo">
-                <label for="tipo">Tipo</label>
-                <input type="text" id="tipo" name="tipo" value="<?= e($datos['tipo'] ?? '') ?>" placeholder="Ej. Fuerza, Cardio, Hipertrofia">
+                <label for="tipo">Tipo o Enfoque</label>
+                <input type="text" id="tipo" name="tipo" value="<?= e($datos['tipo'] ?? '') ?>" placeholder="Ej: Hipertrofia, Fuerza, Pérdida de grasa">
             </div>
             <div class="fila-formulario">
                 <div class="campo">
@@ -732,17 +722,25 @@ $datos = $datos ?? [];
                     <input type="date" id="fecha_fin" name="fecha_fin" value="<?= e($datos['fecha_fin'] ?? '') ?>">
                 </div>
             </div>
-            <button type="submit" class="boton">Crear y continuar</button>
+            <div style="margin-top: 10px;">
+                <button type="submit" class="boton">Crear y estructurar ejercicios</button>
+            </div>
         </form>
     </section>
 
 <?php elseif ($accion === 'editar'): ?>
 
     <section class="panel">
-        <h1>Editar rutina</h1>
+        <div class="panel-cabecera">
+            <h1>Editar Rutina</h1>
+            <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario" method="post" action="<?= url('rutina', 'actualizar') ?>">
@@ -752,7 +750,7 @@ $datos = $datos ?? [];
                 <input type="text" id="nombre" name="nombre" value="<?= e($rutina['nombre']) ?>" required>
             </div>
             <div class="campo">
-                <label for="tipo">Tipo</label>
+                <label for="tipo">Tipo o Enfoque</label>
                 <input type="text" id="tipo" name="tipo" value="<?= e($rutina['tipo'] ?? '') ?>">
             </div>
             <div class="fila-formulario">
@@ -766,14 +764,16 @@ $datos = $datos ?? [];
                 </div>
             </div>
             <div class="campo">
-                <label for="estado">Estado</label>
+                <label for="estado">Estado de la rutina</label>
                 <select id="estado" name="estado">
                     <?php foreach (['activa' => 'Activa', 'completada' => 'Completada', 'cancelada' => 'Cancelada'] as $valor => $etiqueta): ?>
                         <option value="<?= $valor ?>" <?= $rutina['estado'] === $valor ? 'selected' : '' ?>><?= $etiqueta ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="boton">Guardar cambios</button>
+            <div style="margin-top: 10px;">
+                <button type="submit" class="boton">Guardar cambios</button>
+            </div>
         </form>
     </section>
 
@@ -781,17 +781,22 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Ejercicios de "<?= e($rutina['nombre']) ?>"</h1>
-            <a class="boton boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver rutina</a>
+            <div>
+                <h1>Ejercicios de "<?= e($rutina['nombre']) ?>"</h1>
+                <p class="texto-suave">Cliente: <strong><?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></strong></p>
+            </div>
+            <a class="boton boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver detalle general</a>
         </div>
-        <p class="texto-suave">Cliente: <?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></p>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <?php if (empty($detalle)): ?>
-            <p class="texto-suave espacio-superior">Todavía no se agregaron ejercicios.</p>
+            <p class="texto-suave" style="padding: 12px 0;">Esta rutina no tiene ejercicios programados aún. Utiliza el formulario inferior para agregar el primero.</p>
         <?php else: ?>
             <div class="tabla-envoltura">
                 <table>
@@ -800,27 +805,29 @@ $datos = $datos ?? [];
                             <th>Día</th>
                             <th>Ejercicio</th>
                             <th>Series</th>
-                            <th>Repeticiones</th>
-                            <th>Descanso (s)</th>
+                            <th>Reps</th>
+                            <th>Descanso</th>
                             <th>Orden</th>
-                            <th>Acciones</th>
+                            <th style="text-align: right;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($detalle as $fila): ?>
                             <tr>
-                                <td><?= e($fila['dia_semana']) ?></td>
-                                <td><?= e($fila['ejercicio_nombre']) ?></td>
+                                <td style="font-weight: 700; color: var(--color-primario);"><?= e($fila['dia_semana']) ?></td>
+                                <td style="font-weight: 600;"><?= e($fila['ejercicio_nombre']) ?></td>
                                 <td><?= e($fila['series']) ?></td>
                                 <td><?= e($fila['repeticiones']) ?></td>
-                                <td><?= e($fila['tiempo_descanso']) ?></td>
-                                <td><?= e($fila['orden']) ?></td>
+                                <td><?= e($fila['tiempo_descanso']) ?>s</td>
+                                <td>#<?= e($fila['orden']) ?></td>
                                 <td>
-                                    <form method="post" action="<?= url('rutina', 'quitarEjercicio') ?>" onsubmit="return confirm('¿Quitar este ejercicio de la rutina?');">
-                                        <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
-                                        <input type="hidden" name="id_detalle" value="<?= e($fila['id_detalle']) ?>">
-                                        <button type="submit" class="boton boton-pequeno boton-peligro">Quitar</button>
-                                    </form>
+                                    <div class="acciones" style="justify-content: flex-end;">
+                                        <form method="post" action="<?= url('rutina', 'quitarEjercicio') ?>" onsubmit="return confirm('¿Quitar este ejercicio de la rutina?');" style="margin: 0;">
+                                            <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
+                                            <input type="hidden" name="id_detalle" value="<?= e($fila['id_detalle']) ?>">
+                                            <button type="submit" class="boton boton-pequeno boton-peligro">Quitar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -829,53 +836,65 @@ $datos = $datos ?? [];
             </div>
         <?php endif; ?>
 
-        <h2 class="espacio-superior">Agregar ejercicio</h2>
-        <form class="formulario" method="post" action="<?= url('rutina', 'agregarEjercicio') ?>">
-            <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
-            <div class="campo">
-                <label for="id_ejercicio">Ejercicio</label>
-                <select id="id_ejercicio" name="id_ejercicio" required>
-                    <option value="">Selecciona un ejercicio</option>
-                    <?php foreach ($ejercicios as $ejercicio): ?>
-                        <option value="<?= e($ejercicio['id_ejercicio']) ?>"><?= e($ejercicio['nombre']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="campo">
-                <label for="dia_semana">Día de la semana</label>
-                <select id="dia_semana" name="dia_semana" required>
-                    <?php foreach ($dias as $dia): ?>
-                        <option value="<?= e($dia) ?>"><?= e($dia) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="fila-formulario">
-                <div class="campo">
-                    <label for="series">Series</label>
-                    <input type="number" id="series" name="series" min="1" required>
+        <div class="subseccion-tarjeta subseccion-tarjeta-rosa">
+            <h2 class="subseccion-titulo">
+                <span>+</span> Agregar nuevo ejercicio a la rutina
+            </h2>
+            <form class="formulario formulario-full" method="post" action="<?= url('rutina', 'agregarEjercicio') ?>">
+                <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
+                <div class="fila-formulario">
+                    <div class="campo" style="flex: 2;">
+                        <label for="id_ejercicio">Ejercicio</label>
+                        <select id="id_ejercicio" name="id_ejercicio" required>
+                            <option value="">Selecciona un ejercicio</option>
+                            <?php foreach ($ejercicios as $ejercicio): ?>
+                                <option value="<?= e($ejercicio['id_ejercicio']) ?>"><?= e($ejercicio['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="campo" style="flex: 1;">
+                        <label for="dia_semana">Día de la semana</label>
+                        <select id="dia_semana" name="dia_semana" required>
+                            <?php foreach ($dias as $dia): ?>
+                                <option value="<?= e($dia) ?>"><?= e($dia) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
-                <div class="campo">
-                    <label for="repeticiones">Repeticiones</label>
-                    <input type="number" id="repeticiones" name="repeticiones" min="1" required>
+
+                <div class="fila-formulario">
+                    <div class="campo">
+                        <label for="series">Series</label>
+                        <input type="number" id="series" name="series" min="1" placeholder="Ej: 4" required>
+                    </div>
+                    <div class="campo">
+                        <label for="repeticiones">Repeticiones</label>
+                        <input type="number" id="repeticiones" name="repeticiones" min="1" placeholder="Ej: 10" required>
+                    </div>
+                    <div class="campo">
+                        <label for="tiempo_descanso">Descanso (seg)</label>
+                        <input type="number" id="tiempo_descanso" name="tiempo_descanso" min="0" placeholder="Ej: 60" required>
+                    </div>
+                    <div class="campo">
+                        <label for="orden">Orden de ejecución</label>
+                        <input type="number" id="orden" name="orden" min="0" placeholder="Ej: 1" required>
+                    </div>
                 </div>
-                <div class="campo">
-                    <label for="tiempo_descanso">Descanso (segundos)</label>
-                    <input type="number" id="tiempo_descanso" name="tiempo_descanso" min="0" required>
+
+                <div style="margin-top: 8px;">
+                    <button type="submit" class="boton">Agregar a la rutina</button>
                 </div>
-                <div class="campo">
-                    <label for="orden">Orden</label>
-                    <input type="number" id="orden" name="orden" min="0" required>
-                </div>
-            </div>
-            <button type="submit" class="boton">Agregar</button>
-        </form>
+            </form>
+        </div>
     </section>
 
 <?php endif; ?>
 
 </main>
+
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio</p>
+    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
+
 </body>
 </html>

@@ -11,268 +11,166 @@ $datos = $datos ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Gimnasio</title>
+    <title>Gestión de Ejercicios - Gimnasio</title>
+    <!-- Tipografía profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primario: #d9782e;
-            --color-primario-oscuro: #a85820;
-            --color-primario-claro: #fbe9d9;
-            --color-oscuro: #21242b;
-            --color-oscuro-2: #2d323b;
-            --color-secundario: #58626c;
-            --color-fondo: #f6f5f2;
+            /* Paleta Rosa Claro & Sofisticada */
+            --color-primario: #e83e8c;
+            --color-primario-hover: #d62575;
+            --color-primario-suave: #fdf2f6;
+            --color-primario-borde: #fcc2d7;
+            --color-acento: #ff6b8b;
+            
+            /* Fondos y Neutros Claros */
+            --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
-            --color-borde: #e6e2da;
-            --color-texto: #24211c;
-            --color-texto-suave: #6c6459;
-            --color-peligro: #c0362c;
-            --color-peligro-claro: #fbebea;
-            --color-exito: #2f8a4e;
-            --color-exito-claro: #e8f5ec;
-            --radio: 10px;
-            --radio-chico: 6px;
-            --sombra: 0 1px 2px rgba(20, 15, 10, .08);
-            --sombra-media: 0 14px 30px -12px rgba(20, 15, 10, .3);
-            --transicion: 150ms ease;
+            --color-borde-suave: #f1e4e8;
+            
+            /* Textos */
+            --color-texto: #2d242a;
+            --color-texto-suave: #796670;
+            --color-texto-mutado: #a89aa1;
+            
+            /* Estados */
+            --color-peligro: #ef4444;
+            --color-peligro-claro: #fef2f2;
+            --color-peligro-borde: #fecaca;
+            --color-exito: #10b981;
+            --color-exito-claro: #ecfdf5;
+
+            /* Radios y Sombras */
+            --radio-lg: 20px;
+            --radio-md: 12px;
+            --radio-sm: 8px;
+            --sombra-suave: 0 4px 20px -2px rgba(232, 62, 140, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --sombra-tarjeta: 0 12px 32px -4px rgba(232, 62, 140, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            --sombra-boton: 0 6px 18px rgba(232, 62, 140, 0.25);
+            --transicion: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--color-fondo);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #fdf6f8 0%, var(--color-fondo) 100%);
             color: var(--color-texto);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1, h2, h3 {
+            font-weight: 700;
+            color: var(--color-texto);
             line-height: 1.25;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
 
         a {
-            color: var(--color-primario-oscuro);
-            text-decoration: none;
-            transition: color var(--transicion);
-        }
-
-        a:hover {
             color: var(--color-primario);
-            text-decoration: underline;
+            text-decoration: none;
+            transition: var(--transicion);
         }
 
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid var(--color-primario);
-            outline-offset: 2px;
-        }
-
-        .contenedor {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 20px 56px;
-        }
-
-        /* Navegación */
+        /* Barra de Navegación */
         .nav {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--color-oscuro);
-            border-bottom: 3px solid var(--color-primario);
-            padding: 14px 24px;
-            box-shadow: var(--sombra-media);
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
         }
 
         .nav-marca {
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-texto);
             font-weight: 800;
             font-size: 1.15rem;
-            letter-spacing: -0.01em;
-            margin-right: 16px;
+            letter-spacing: -0.02em;
         }
 
-        .nav-marca::before {
-            content: "🏋 ";
+        .nav-marca-icono {
+            background: linear-gradient(135deg, #ff85a1 0%, var(--color-primario) 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(232, 62, 140, 0.25);
         }
 
         .nav-enlaces {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .nav a {
-            color: #c7ccd4;
-            font-size: 0.94rem;
-            font-weight: 500;
-            padding: 4px 2px;
-            border-bottom: 2px solid transparent;
+            color: var(--color-texto-suave);
+            font-size: 0.92rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radio-sm);
         }
 
-        .nav a:hover {
-            color: #fff;
+        .nav a:hover,
+        .nav a.activo {
+            color: var(--color-primario);
+            background: var(--color-primario-suave);
             text-decoration: none;
-            border-bottom-color: var(--color-primario);
         }
 
         .nav-salir {
-            color: #fff;
-            font-weight: 600;
+            color: var(--color-primario) !important;
+            background: var(--color-primario-suave) !important;
+            border: 1px solid var(--color-primario-borde);
         }
 
-        /* Landing / dashboard: banda oscura tipo "hero" */
-        .landing {
-            background: linear-gradient(135deg, var(--color-oscuro), var(--color-oscuro-2));
-            color: #fff;
-            border-radius: var(--radio);
-            box-shadow: var(--sombra-media);
-            padding: 48px 36px;
-            text-align: center;
+        .nav-salir:hover {
+            background: var(--color-primario) !important;
+            color: #ffffff !important;
         }
 
-        .landing h1 {
-            margin: 0 0 8px;
-            font-size: 2.1rem;
-        }
-
-        .landing p {
-            color: #c7ccd4;
-            font-size: 1.02rem;
-            max-width: 46em;
+        /* Contenedor Principal */
+        .contenedor {
+            max-width: 1140px;
+            width: 100%;
             margin: 0 auto;
+            padding: 36px 24px 60px;
+            flex: 1;
         }
 
-        .landing-acciones {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 26px;
-            flex-wrap: wrap;
-        }
-
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 28px;
-            text-align: left;
-        }
-
-        .tarjeta {
-            display: block;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-left: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            padding: 20px;
-            font-weight: 600;
-            color: #fff;
-            transition: transform var(--transicion), background var(--transicion), border-color var(--transicion);
-        }
-
-        .tarjeta:hover {
-            background: rgba(255, 255, 255, .12);
-            border-color: var(--color-primario);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-
-        /* Botones */
-        .boton {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radio-chico);
-            background: var(--color-primario);
-            color: #fff;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            box-shadow: var(--sombra);
-            transition: background var(--transicion), transform var(--transicion), box-shadow var(--transicion);
-        }
-
-        .boton:hover {
-            background: var(--color-primario-oscuro);
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--sombra-media);
-        }
-
-        .boton:active {
-            transform: translateY(0);
-        }
-
-        .boton-secundario {
-            background: transparent;
-            color: #fff;
-            border-color: rgba(255, 255, 255, .35);
-        }
-
-        .boton-secundario:hover {
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        /* Fuera del hero oscuro (paneles claros), el botón secundario usa tinta oscura */
-        .panel .boton-secundario,
-        .panel-cabecera .boton-secundario {
-            color: var(--color-primario-oscuro);
-            border-color: var(--color-borde);
-        }
-
-        .panel .boton-secundario:hover,
-        .panel-cabecera .boton-secundario:hover {
-            background: var(--color-primario-claro);
-            border-color: var(--color-primario);
-        }
-
-        .boton-peligro {
-            background: var(--color-peligro);
-        }
-
-        .boton-peligro:hover {
-            background: #8a1d17;
-        }
-
-        .boton-pequeno {
-            padding: 6px 12px;
-            font-size: 0.83rem;
-            box-shadow: none;
-        }
-
-        /* Tarjetas de contenido / formularios */
+        /* Tarjeta / Panel Principal */
         .panel {
             background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            padding: 26px 28px;
-            margin-top: 24px;
-        }
-
-        .panel h1 {
-            font-size: 1.4rem;
-            margin: 0;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-lg);
+            box-shadow: var(--sombra-tarjeta);
+            padding: 36px 40px;
+            position: relative;
+            overflow: hidden;
         }
 
         .panel-cabecera {
@@ -280,308 +178,319 @@ $datos = $datos ?? [];
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 16px;
+            margin-bottom: 26px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
         }
 
+        .panel-cabecera h1,
+        .panel > h1 {
+            font-size: 1.65rem;
+            color: var(--color-texto);
+        }
+
+        /* Botones */
+        .boton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radio-md);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
+            color: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--sombra-boton);
+            transition: var(--transicion);
+        }
+
+        .boton:hover {
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 62, 140, 0.35);
+        }
+
+        .boton-secundario {
+            background: var(--color-superficie);
+            color: var(--color-texto);
+            border: 1px solid var(--color-borde-suave);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .boton-secundario:hover {
+            background: var(--color-primario-suave);
+            color: var(--color-primario);
+            border-color: var(--color-primario-borde);
+            transform: translateY(-2px);
+        }
+
+        .boton-peligro {
+            background: var(--color-peligro);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .boton-peligro:hover {
+            background: #dc2626;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+        }
+
+        .boton-pequeno {
+            padding: 6px 14px;
+            font-size: 0.84rem;
+            border-radius: var(--radio-sm);
+        }
+
+        /* Tablas */
+        .tabla-envoltura {
+            overflow-x: auto;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            background: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #faf4f7;
+            color: var(--color-texto-suave);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--color-borde-suave);
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 0.92rem;
+            color: var(--color-texto);
+            border-bottom: 1px solid var(--color-borde-suave);
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: var(--transicion);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--color-primario-suave);
+        }
+
+        td .acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Formularios */
         .formulario {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 560px;
+            gap: 20px;
+            margin-top: 18px;
         }
 
         .formulario-ancho {
-            max-width: none;
+            max-width: 720px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        /* El atributo HTML "hidden" necesita más especificidad que
-           ".campo { display: flex }" para ocultar el bloque de verdad. */
-        .campo[hidden] {
-            display: none;
+            gap: 8px;
         }
 
         .campo label {
             font-weight: 600;
             font-size: 0.88rem;
-            color: var(--color-secundario);
-        }
-
-        .campo input,
-        .campo select,
-        .campo textarea {
-            padding: 10px 12px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio-chico);
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: var(--color-superficie);
             color: var(--color-texto);
-            transition: border-color var(--transicion), box-shadow var(--transicion);
         }
 
-        .campo input:hover,
-        .campo select:hover,
-        .campo textarea:hover {
-            border-color: #cfc9bd;
+        .campo input[type="text"],
+        .campo input[type="url"],
+        .campo textarea,
+        .campo select {
+            padding: 12px 14px;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            font-size: 0.94rem;
+            font-family: inherit;
+            background: #ffffff;
+            color: var(--color-texto);
+            transition: var(--transicion);
         }
 
         .campo input:focus,
-        .campo select:focus,
-        .campo textarea:focus {
+        .campo textarea:focus,
+        .campo select:focus {
             outline: none;
             border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px var(--color-primario-claro);
-        }
-
-        .campo input:disabled {
-            background: #f2f1ed;
-            color: var(--color-texto-suave);
+            box-shadow: 0 0 0 4px var(--color-primario-suave);
         }
 
         .campo textarea {
             resize: vertical;
         }
 
-        .fila-formulario {
+        /* Selector de grupos musculares (estilo cuadrícula de chips) */
+        .selector-grupos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 4px;
         }
 
-        /* Tablas */
-        .tabla-envoltura {
-            overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid var(--color-borde);
-            border-radius: var(--radio);
-            scrollbar-width: thin;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--color-superficie);
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px 14px;
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radio-sm);
+            border: 1px solid var(--color-borde-suave);
+            background: #faf7f8;
+            cursor: pointer;
+            transition: var(--transicion);
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        th {
-            background: var(--color-oscuro);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.78rem;
+        .checkbox-label:hover {
+            border-color: var(--color-primario-borde);
+            background: var(--color-primario-suave);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            accent-color: var(--color-primario);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Vista de Detalle (Ver) */
+        .detalle-bloque {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .detalle-item {
+            padding: 14px 18px;
+            border-radius: var(--radio-md);
+            background: #faf7f8;
+            border: 1px solid var(--color-borde-suave);
+        }
+
+        .detalle-item strong {
+            display: block;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            color: var(--color-primario);
+            margin-bottom: 4px;
         }
 
-        tbody tr {
-            border-bottom: 1px solid var(--color-borde);
-            transition: background var(--transicion);
+        .detalle-item p {
+            color: var(--color-texto);
+            font-size: 0.95rem;
         }
 
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #faf9f6;
-        }
-
-        tbody tr:hover {
-            background: var(--color-primario-claro);
-        }
-
-        td .acciones {
+        .chips-contenedor {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
         }
 
-        /* Mensajes / alertas */
+        .chip-grupo {
+            background: var(--color-primario-suave);
+            border: 1px solid var(--color-primario-borde);
+            color: var(--color-primario-hover);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 600;
+        }
+
+        /* Alertas */
         .alerta {
-            padding: 12px 16px;
-            border-radius: var(--radio-chico);
-            margin-bottom: 16px;
+            padding: 14px 18px;
+            border-radius: var(--radio-md);
+            margin-bottom: 20px;
             font-size: 0.92rem;
-            border-left: 3px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alerta-error {
             background: var(--color-peligro-claro);
             color: var(--color-peligro);
-            border-left-color: var(--color-peligro);
-        }
-
-        .alerta-error::before {
-            content: "⚠ ";
-        }
-
-        .alerta-exito {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-            border-left-color: var(--color-exito);
-        }
-
-        .alerta-exito::before {
-            content: "✓ ";
-        }
-
-        /* Insignias de estado */
-        .insignia {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .insignia::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .insignia-activo {
-            background: var(--color-exito-claro);
-            color: var(--color-exito);
-        }
-
-        .insignia-inactivo {
-            background: #f0efeb;
-            color: var(--color-texto-suave);
-        }
-
-        .insignia-rol {
-            background: var(--color-primario-claro);
-            color: var(--color-primario-oscuro);
-        }
-
-        /* Páginas de error */
-        .error-pagina {
-            text-align: center;
-            padding: 72px 20px;
-            background: var(--color-superficie);
-            border: 1px solid var(--color-borde);
-            border-top: 3px solid var(--color-primario);
-            border-radius: var(--radio);
-            box-shadow: var(--sombra);
-            margin-top: 24px;
-        }
-
-        .error-pagina h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-        }
-
-        .error-pagina p {
-            color: var(--color-texto-suave);
-            margin-bottom: 20px;
-        }
-
-        /* Auth (login/registro) */
-        .auth-panel {
-            max-width: 420px;
-            margin: 56px auto;
-            border-top: 3px solid var(--color-primario);
-        }
-
-        .auth-panel h1 {
-            font-size: 1.4rem;
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .auth-pie {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
-            color: var(--color-texto-suave);
+            border: 1px solid var(--color-peligro-borde);
         }
 
         /* Pie de página */
         .pie {
-            margin-top: 40px;
-            padding: 20px 16px 36px;
+            margin-top: auto;
+            padding: 26px;
             text-align: center;
             color: var(--color-texto-suave);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--color-borde-suave);
+            background: rgba(255, 255, 255, 0.7);
         }
 
-        /* Utilidades */
-        .texto-suave {
-            color: var(--color-texto-suave);
-        }
-
-        .espacio-superior {
-            margin-top: 16px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 640px) {
-            .contenedor {
-                padding: 20px 14px 40px;
-            }
-
+        @media (max-width: 768px) {
             .nav {
-                padding: 12px 16px;
+                padding: 14px 20px;
             }
-
-            .landing {
-                padding: 32px 22px;
-            }
-
-            .landing h1 {
-                font-size: 1.7rem;
-            }
-
-            .landing-acciones {
-                flex-direction: column;
-            }
-
-            .landing-acciones .boton {
-                width: 100%;
-                justify-content: center;
-            }
-
             .panel {
-                padding: 20px;
+                padding: 24px 20px;
             }
-
-            .auth-panel {
-                margin: 24px auto;
+            .selector-grupos {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+
+<?php if ($usuarioSesion): ?>
 <nav class="nav">
-    <span class="nav-marca">Gimnasio</span>
+    <div class="nav-marca">
+        <span class="nav-marca-icono">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+        </span>
+        Gimnasio
+    </div>
     <div class="nav-enlaces">
         <a href="<?= url('login') ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
             <a href="<?= url('usuario') ?>">Usuarios</a>
             <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
+            <a href="<?= url('ejercicio') ?>" class="activo">Ejercicios</a>
         <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
             <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
+            <a href="<?= url('ejercicio') ?>" class="activo">Ejercicios</a>
             <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
             <a href="<?= url('rutina') ?>">Rutinas</a>
         <?php endif; ?>
@@ -591,18 +500,25 @@ $datos = $datos ?? [];
         <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
+<?php endif; ?>
+
 <main class="contenedor">
 
 <?php if ($accion === 'listar'): ?>
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Ejercicios</h1>
-            <a class="boton" href="<?= url('ejercicio', 'crear') ?>">Nuevo ejercicio</a>
+            <h1>Catálogo de Ejercicios</h1>
+            <a class="boton" href="<?= url('ejercicio', 'crear') ?>">
+                <span>+ Nuevo ejercicio</span>
+            </a>
         </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <div class="tabla-envoltura">
@@ -611,24 +527,34 @@ $datos = $datos ?? [];
                     <tr>
                         <th>Nombre</th>
                         <th>Descripción</th>
-                        <th>Acciones</th>
+                        <th style="width: 220px; text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($ejercicios as $ejercicio): ?>
+                    <?php if (empty($ejercicios)): ?>
                         <tr>
-                            <td><?= e($ejercicio['nombre']) ?></td>
-                            <td><?= e($ejercicio['descripcion'] ?? '') ?></td>
-                            <td class="acciones">
-                                <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'ver', ['id' => $ejercicio['id_ejercicio']]) ?>">Ver</a>
-                                <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'editar', ['id' => $ejercicio['id_ejercicio']]) ?>">Editar</a>
-                                <form method="post" action="<?= url('ejercicio', 'eliminar') ?>" onsubmit="return confirm('¿Eliminar este ejercicio?');">
-                                    <input type="hidden" name="id" value="<?= e($ejercicio['id_ejercicio']) ?>">
-                                    <button type="submit" class="boton boton-pequeno boton-peligro">Eliminar</button>
-                                </form>
+                            <td colspan="3" style="text-align: center; color: var(--color-texto-suave); padding: 30px;">
+                                No hay ejercicios registrados aún.
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php foreach ($ejercicios as $ejercicio): ?>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--color-texto);"><?= e($ejercicio['nombre']) ?></td>
+                                <td style="color: var(--color-texto-suave);"><?= e($ejercicio['descripcion'] ?? '-') ?></td>
+                                <td>
+                                    <div class="acciones" style="justify-content: flex-end;">
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'ver', ['id' => $ejercicio['id_ejercicio']]) ?>">Ver</a>
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'editar', ['id' => $ejercicio['id_ejercicio']]) ?>">Editar</a>
+                                        <form method="post" action="<?= url('ejercicio', 'eliminar') ?>" onsubmit="return confirm('¿Eliminar este ejercicio?');" style="margin: 0;">
+                                            <input type="hidden" name="id" value="<?= e($ejercicio['id_ejercicio']) ?>">
+                                            <button type="submit" class="boton boton-pequeno boton-peligro">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -639,85 +565,120 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1><?= e($ejercicio['nombre']) ?></h1>
-            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">Volver</a>
+            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
         </div>
 
-        <p><strong>Descripción:</strong> <?= e($ejercicio['descripcion'] ?? 'Sin descripción') ?></p>
-        <p><strong>Beneficio:</strong> <?= e($ejercicio['beneficio'] ?? 'No especificado') ?></p>
-        <p><strong>Indicaciones:</strong> <?= e($ejercicio['indicaciones'] ?? 'No especificadas') ?></p>
-        <?php if (!empty($ejercicio['url_video'])): ?>
-            <p><strong>Video:</strong> <a href="<?= e($ejercicio['url_video']) ?>" target="_blank" rel="noopener">Ver video</a></p>
-        <?php endif; ?>
+        <div class="detalle-bloque">
+            <div class="detalle-item">
+                <strong>Descripción</strong>
+                <p><?= nl2br(e($ejercicio['descripcion'] ?? 'Sin descripción')) ?></p>
+            </div>
 
-        <p><strong>Grupos musculares:</strong></p>
-        <?php if (empty($grupos)): ?>
-            <p class="texto-suave">No tiene grupos musculares asociados.</p>
-        <?php else: ?>
-            <ul>
-                <?php foreach ($grupos as $grupo): ?>
-                    <li><?= e($grupo['nombre']) ?></li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
+            <div class="detalle-item">
+                <strong>Beneficio</strong>
+                <p><?= nl2br(e($ejercicio['beneficio'] ?? 'No especificado')) ?></p>
+            </div>
+
+            <div class="detalle-item">
+                <strong>Indicaciones Técnicas</strong>
+                <p><?= nl2br(e($ejercicio['indicaciones'] ?? 'No especificadas')) ?></p>
+            </div>
+
+            <?php if (!empty($ejercicio['url_video'])): ?>
+                <div class="detalle-item">
+                    <strong>Demostración en Video</strong>
+                    <p><a href="<?= e($ejercicio['url_video']) ?>" target="_blank" rel="noopener" style="font-weight: 600;">Ver enlace externo de video ↗</a></p>
+                </div>
+            <?php endif; ?>
+
+            <div class="detalle-item">
+                <strong>Grupos Musculares Asociados</strong>
+                <?php if (empty($grupos)): ?>
+                    <p style="color: var(--color-texto-suave);">No tiene grupos musculares asignados.</p>
+                <?php else: ?>
+                    <div class="chips-contenedor">
+                        <?php foreach ($grupos as $grupo): ?>
+                            <span class="chip-grupo"><?= e($grupo['nombre']) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </section>
 
 <?php elseif ($accion === 'crear'): ?>
 
     <section class="panel">
-        <h1>Nuevo ejercicio</h1>
+        <div class="panel-cabecera">
+            <h1>Nuevo Ejercicio</h1>
+            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario formulario-ancho" method="post" action="<?= url('ejercicio', 'guardar') ?>">
             <div class="campo">
-                <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" required>
+                <label for="nombre">Nombre del ejercicio</label>
+                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" placeholder="Ej: Press de banca plano" required>
             </div>
             <div class="campo">
                 <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3"><?= e($datos['descripcion'] ?? '') ?></textarea>
+                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Breve descripción del movimiento..."><?= e($datos['descripcion'] ?? '') ?></textarea>
             </div>
             <div class="campo">
                 <label for="beneficio">Beneficio</label>
-                <textarea id="beneficio" name="beneficio" rows="3"><?= e($datos['beneficio'] ?? '') ?></textarea>
+                <textarea id="beneficio" name="beneficio" rows="3" placeholder="¿Qué aporta al atleta?"><?= e($datos['beneficio'] ?? '') ?></textarea>
             </div>
             <div class="campo">
-                <label for="indicaciones">Indicaciones</label>
-                <textarea id="indicaciones" name="indicaciones" rows="3"><?= e($datos['indicaciones'] ?? '') ?></textarea>
+                <label for="indicaciones">Indicaciones posturales y ejecución</label>
+                <textarea id="indicaciones" name="indicaciones" rows="3" placeholder="Espalda apoyada, retracción escapular..."><?= e($datos['indicaciones'] ?? '') ?></textarea>
             </div>
             <div class="campo">
-                <label for="url_video">URL de video (opcional)</label>
-                <input type="url" id="url_video" name="url_video" value="<?= e($datos['url_video'] ?? '') ?>">
+                <label for="url_video">URL de video demostrativo (opcional)</label>
+                <input type="url" id="url_video" name="url_video" value="<?= e($datos['url_video'] ?? '') ?>" placeholder="https://youtube.com/...">
             </div>
             <div class="campo">
-                <label>Grupos musculares</label>
-                <?php foreach ($gruposDisponibles as $grupo): ?>
-                    <label>
-                        <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
-                            <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados, true) ? 'checked' : '' ?>>
-                        <?= e($grupo['nombre']) ?>
-                    </label>
-                <?php endforeach; ?>
+                <label>Grupos musculares involucrados</label>
+                <div class="selector-grupos">
+                    <?php foreach ($gruposDisponibles as $grupo): ?>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
+                                <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados ?? [], true) ? 'checked' : '' ?>>
+                            <span><?= e($grupo['nombre']) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
             </div>
-            <button type="submit" class="boton">Guardar</button>
+            <div style="margin-top: 10px;">
+                <button type="submit" class="boton">Guardar ejercicio</button>
+            </div>
         </form>
     </section>
 
 <?php elseif ($accion === 'editar'): ?>
 
     <section class="panel">
-        <h1>Editar ejercicio</h1>
+        <div class="panel-cabecera">
+            <h1>Editar Ejercicio</h1>
+            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
+        </div>
 
         <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error"><?= e($error) ?></div>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= e($error) ?>
+            </div>
         <?php endif; ?>
 
         <form class="formulario formulario-ancho" method="post" action="<?= url('ejercicio', 'actualizar') ?>">
             <input type="hidden" name="id" value="<?= e($ejercicio['id_ejercicio']) ?>">
             <div class="campo">
-                <label for="nombre">Nombre</label>
+                <label for="nombre">Nombre del ejercicio</label>
                 <input type="text" id="nombre" name="nombre" value="<?= e($ejercicio['nombre']) ?>" required>
             </div>
             <div class="campo">
@@ -729,7 +690,7 @@ $datos = $datos ?? [];
                 <textarea id="beneficio" name="beneficio" rows="3"><?= e($ejercicio['beneficio'] ?? '') ?></textarea>
             </div>
             <div class="campo">
-                <label for="indicaciones">Indicaciones</label>
+                <label for="indicaciones">Indicaciones posturales y ejecución</label>
                 <textarea id="indicaciones" name="indicaciones" rows="3"><?= e($ejercicio['indicaciones'] ?? '') ?></textarea>
             </div>
             <div class="campo">
@@ -737,24 +698,30 @@ $datos = $datos ?? [];
                 <input type="url" id="url_video" name="url_video" value="<?= e($ejercicio['url_video'] ?? '') ?>">
             </div>
             <div class="campo">
-                <label>Grupos musculares</label>
-                <?php foreach ($gruposDisponibles as $grupo): ?>
-                    <label>
-                        <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
-                            <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados, true) ? 'checked' : '' ?>>
-                        <?= e($grupo['nombre']) ?>
-                    </label>
-                <?php endforeach; ?>
+                <label>Grupos musculares involucrados</label>
+                <div class="selector-grupos">
+                    <?php foreach ($gruposDisponibles as $grupo): ?>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
+                                <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados ?? [], true) ? 'checked' : '' ?>>
+                            <span><?= e($grupo['nombre']) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
             </div>
-            <button type="submit" class="boton">Guardar cambios</button>
+            <div style="margin-top: 10px;">
+                <button type="submit" class="boton">Guardar cambios</button>
+            </div>
         </form>
     </section>
 
 <?php endif; ?>
 
 </main>
+
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio</p>
+    <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
+
 </body>
 </html>
