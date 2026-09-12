@@ -41,13 +41,15 @@ class GrupoMuscularController
     {
         $this->verificarAcceso();
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('grupoMuscular', 'crear');
             return;
         }
 
-        $nombre = input('nombre', '');
-        $descripcion = input('descripcion', '');
+        $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
+        if (is_string($nombre)) { $nombre = trim($nombre); }
+        $descripcion = $_POST['descripcion'] ?? $_GET['descripcion'] ?? '';
+        if (is_string($descripcion)) { $descripcion = trim($descripcion); }
 
         $error = $this->validar($nombre, null);
 
@@ -65,7 +67,9 @@ class GrupoMuscularController
     {
         $this->verificarAcceso();
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $grupo = $this->grupoMuscularModelo->buscarPorId($id);
 
         if (!$grupo) {
@@ -80,7 +84,9 @@ class GrupoMuscularController
     {
         $this->verificarAcceso();
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $grupo = $this->grupoMuscularModelo->buscarPorId($id);
 
         if (!$grupo) {
@@ -88,8 +94,10 @@ class GrupoMuscularController
             return;
         }
 
-        $nombre = input('nombre', '');
-        $descripcion = input('descripcion', '');
+        $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
+        if (is_string($nombre)) { $nombre = trim($nombre); }
+        $descripcion = $_POST['descripcion'] ?? $_GET['descripcion'] ?? '';
+        if (is_string($descripcion)) { $descripcion = trim($descripcion); }
 
         $error = $this->validar($nombre, $id);
 
@@ -110,12 +118,14 @@ class GrupoMuscularController
     {
         $this->verificarAcceso();
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('grupoMuscular', 'index');
             return;
         }
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $this->grupoMuscularModelo->eliminar($id);
 
         $this->redirect('grupoMuscular', 'index');
@@ -174,7 +184,7 @@ class GrupoMuscularController
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */
     private function redirect(string $controlador, string $accion = 'index', array $parametros = []): void
     {
-        header('Location: ' . url($controlador, $accion, $parametros));
+        header('Location: ' . '/index.php?' . http_build_query(array_merge(['controller' => $controlador, 'action' => $accion], $parametros)));
         exit;
     }
 }

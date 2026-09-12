@@ -47,7 +47,9 @@ class RutinaController
     {
         $this->requireRole(['instructor', 'cliente']);
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $rutina = $this->rutinaModelo->buscarPorId($id);
 
         if (!$rutina || !$this->tieneAcceso($rutina)) {
@@ -73,17 +75,29 @@ class RutinaController
     {
         $this->requireRole(['instructor']);
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('rutina', 'crear');
             return;
         }
 
+        $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
+        if (is_string($nombre)) { $nombre = trim($nombre); }
+        $tipo = $_POST['tipo'] ?? $_GET['tipo'] ?? '';
+        if (is_string($tipo)) { $tipo = trim($tipo); }
+        $fechaInicio = $_POST['fecha_inicio'] ?? $_GET['fecha_inicio'] ?? '';
+        if (is_string($fechaInicio)) { $fechaInicio = trim($fechaInicio); }
+        $fechaFin = $_POST['fecha_fin'] ?? $_GET['fecha_fin'] ?? '';
+        if (is_string($fechaFin)) { $fechaFin = trim($fechaFin); }
+        $idCliente = $_POST['id_cliente'] ?? $_GET['id_cliente'] ?? 0;
+        if (is_string($idCliente)) { $idCliente = trim($idCliente); }
+        $idCliente = (int) $idCliente;
+
         $datos = [
-            'nombre' => input('nombre', ''),
-            'tipo' => input('tipo', '') ?: null,
-            'fecha_inicio' => input('fecha_inicio', ''),
-            'fecha_fin' => input('fecha_fin', '') ?: null,
-            'id_cliente' => (int) input('id_cliente', 0),
+            'nombre' => $nombre,
+            'tipo' => $tipo ?: null,
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin ?: null,
+            'id_cliente' => $idCliente,
         ];
 
         $error = $this->validarDatosGenerales($datos);
@@ -106,7 +120,9 @@ class RutinaController
     {
         $this->requireRole(['instructor']);
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $rutina = $this->rutinaModelo->buscarPorId($id);
 
         if (!$rutina || !$this->esPropietario($rutina)) {
@@ -121,7 +137,9 @@ class RutinaController
     {
         $this->requireRole(['instructor']);
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $rutina = $this->rutinaModelo->buscarPorId($id);
 
         if (!$rutina || !$this->esPropietario($rutina)) {
@@ -129,12 +147,23 @@ class RutinaController
             return;
         }
 
+        $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
+        if (is_string($nombre)) { $nombre = trim($nombre); }
+        $tipo = $_POST['tipo'] ?? $_GET['tipo'] ?? '';
+        if (is_string($tipo)) { $tipo = trim($tipo); }
+        $fechaInicio = $_POST['fecha_inicio'] ?? $_GET['fecha_inicio'] ?? '';
+        if (is_string($fechaInicio)) { $fechaInicio = trim($fechaInicio); }
+        $fechaFin = $_POST['fecha_fin'] ?? $_GET['fecha_fin'] ?? '';
+        if (is_string($fechaFin)) { $fechaFin = trim($fechaFin); }
+        $estado = $_POST['estado'] ?? $_GET['estado'] ?? 'activa';
+        if (is_string($estado)) { $estado = trim($estado); }
+
         $datos = [
-            'nombre' => input('nombre', ''),
-            'tipo' => input('tipo', '') ?: null,
-            'fecha_inicio' => input('fecha_inicio', ''),
-            'fecha_fin' => input('fecha_fin', '') ?: null,
-            'estado' => input('estado', 'activa'),
+            'nombre' => $nombre,
+            'tipo' => $tipo ?: null,
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin ?: null,
+            'estado' => $estado,
         ];
 
         $error = $this->validarDatosGenerales($datos);
@@ -158,7 +187,9 @@ class RutinaController
     {
         $this->requireRole(['instructor']);
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $rutina = $this->rutinaModelo->buscarPorId($id);
 
         if (!$rutina || !$this->esPropietario($rutina)) {
@@ -175,12 +206,14 @@ class RutinaController
         ]);
     }
 
-    /** Agrega un ejercicio (día, series, repeticiones, descanso, orden) a la rutina. */
+    /** Agrega un ejercicio (día, series, repeticiones, peso, descanso, orden) a la rutina. */
     public function agregarEjercicio(): void
     {
         $this->requireRole(['instructor']);
 
-        $id = (int) input('id_rutina', 0);
+        $id = $_POST['id_rutina'] ?? $_GET['id_rutina'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $rutina = $this->rutinaModelo->buscarPorId($id);
 
         if (!$rutina || !$this->esPropietario($rutina)) {
@@ -188,18 +221,40 @@ class RutinaController
             return;
         }
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('rutina', 'asignar', ['id' => $id]);
             return;
         }
 
+        $peso = $_POST['peso'] ?? $_GET['peso'] ?? '';
+        if (is_string($peso)) { $peso = trim($peso); }
+
+        $idEjercicio = $_POST['id_ejercicio'] ?? $_GET['id_ejercicio'] ?? 0;
+        if (is_string($idEjercicio)) { $idEjercicio = trim($idEjercicio); }
+        $idEjercicio = (int) $idEjercicio;
+        $diaSemana = $_POST['dia_semana'] ?? $_GET['dia_semana'] ?? '';
+        if (is_string($diaSemana)) { $diaSemana = trim($diaSemana); }
+        $series = $_POST['series'] ?? $_GET['series'] ?? 0;
+        if (is_string($series)) { $series = trim($series); }
+        $series = (int) $series;
+        $repeticiones = $_POST['repeticiones'] ?? $_GET['repeticiones'] ?? 0;
+        if (is_string($repeticiones)) { $repeticiones = trim($repeticiones); }
+        $repeticiones = (int) $repeticiones;
+        $tiempoDescanso = $_POST['tiempo_descanso'] ?? $_GET['tiempo_descanso'] ?? 0;
+        if (is_string($tiempoDescanso)) { $tiempoDescanso = trim($tiempoDescanso); }
+        $tiempoDescanso = (int) $tiempoDescanso;
+        $orden = $_POST['orden'] ?? $_GET['orden'] ?? 0;
+        if (is_string($orden)) { $orden = trim($orden); }
+        $orden = (int) $orden;
+
         $datos = [
-            'id_ejercicio' => (int) input('id_ejercicio', 0),
-            'dia_semana' => input('dia_semana', ''),
-            'series' => (int) input('series', 0),
-            'repeticiones' => (int) input('repeticiones', 0),
-            'tiempo_descanso' => (int) input('tiempo_descanso', 0),
-            'orden' => (int) input('orden', 0),
+            'id_ejercicio' => $idEjercicio,
+            'dia_semana' => $diaSemana,
+            'series' => $series,
+            'repeticiones' => $repeticiones,
+            'peso' => $peso !== '' ? (float) $peso : null,
+            'tiempo_descanso' => $tiempoDescanso,
+            'orden' => $orden,
         ];
 
         $error = $this->validarDetalle($datos);
@@ -220,21 +275,138 @@ class RutinaController
         $this->redirect('rutina', 'asignar', ['id' => $id]);
     }
 
+    /** Formulario para editar una fila de DETALLE_RUTINA ya asignada a la rutina. */
+    public function editarEjercicio(): void
+    {
+        $this->requireRole(['instructor']);
+
+        $idRutina = $_POST['id_rutina'] ?? $_GET['id_rutina'] ?? 0;
+        if (is_string($idRutina)) { $idRutina = trim($idRutina); }
+        $idRutina = (int) $idRutina;
+        $rutina = $this->rutinaModelo->buscarPorId($idRutina);
+
+        if (!$rutina || !$this->esPropietario($rutina)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $idDetalle = $_POST['id_detalle'] ?? $_GET['id_detalle'] ?? 0;
+        if (is_string($idDetalle)) { $idDetalle = trim($idDetalle); }
+        $idDetalle = (int) $idDetalle;
+        $detalle = $this->detalleModelo->buscarPorId($idDetalle, $idRutina);
+
+        if (!$detalle) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $this->render('editarEjercicio', [
+            'error' => null,
+            'rutina' => $rutina,
+            'detalle' => $detalle,
+            'ejercicios' => $this->ejercicioModelo->listarTodos(),
+            'dias' => self::DIAS_SEMANA,
+        ]);
+    }
+
+    /** Procesa la edición de una fila de DETALLE_RUTINA ya asignada a la rutina. */
+    public function actualizarEjercicio(): void
+    {
+        $this->requireRole(['instructor']);
+
+        $idRutina = $_POST['id_rutina'] ?? $_GET['id_rutina'] ?? 0;
+        if (is_string($idRutina)) { $idRutina = trim($idRutina); }
+        $idRutina = (int) $idRutina;
+        $rutina = $this->rutinaModelo->buscarPorId($idRutina);
+
+        if (!$rutina || !$this->esPropietario($rutina)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $idDetalle = $_POST['id_detalle'] ?? $_GET['id_detalle'] ?? 0;
+        if (is_string($idDetalle)) { $idDetalle = trim($idDetalle); }
+        $idDetalle = (int) $idDetalle;
+        $detalleExistente = $this->detalleModelo->buscarPorId($idDetalle, $idRutina);
+
+        if (!$detalleExistente) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
+            $this->redirect('rutina', 'asignar', ['id' => $idRutina]);
+            return;
+        }
+
+        $peso = $_POST['peso'] ?? $_GET['peso'] ?? '';
+        if (is_string($peso)) { $peso = trim($peso); }
+
+        $idEjercicio = $_POST['id_ejercicio'] ?? $_GET['id_ejercicio'] ?? 0;
+        if (is_string($idEjercicio)) { $idEjercicio = trim($idEjercicio); }
+        $idEjercicio = (int) $idEjercicio;
+        $diaSemana = $_POST['dia_semana'] ?? $_GET['dia_semana'] ?? '';
+        if (is_string($diaSemana)) { $diaSemana = trim($diaSemana); }
+        $series = $_POST['series'] ?? $_GET['series'] ?? 0;
+        if (is_string($series)) { $series = trim($series); }
+        $series = (int) $series;
+        $repeticiones = $_POST['repeticiones'] ?? $_GET['repeticiones'] ?? 0;
+        if (is_string($repeticiones)) { $repeticiones = trim($repeticiones); }
+        $repeticiones = (int) $repeticiones;
+        $tiempoDescanso = $_POST['tiempo_descanso'] ?? $_GET['tiempo_descanso'] ?? 0;
+        if (is_string($tiempoDescanso)) { $tiempoDescanso = trim($tiempoDescanso); }
+        $tiempoDescanso = (int) $tiempoDescanso;
+        $orden = $_POST['orden'] ?? $_GET['orden'] ?? 0;
+        if (is_string($orden)) { $orden = trim($orden); }
+        $orden = (int) $orden;
+
+        $datos = [
+            'id_ejercicio' => $idEjercicio,
+            'dia_semana' => $diaSemana,
+            'series' => $series,
+            'repeticiones' => $repeticiones,
+            'peso' => $peso !== '' ? (float) $peso : null,
+            'tiempo_descanso' => $tiempoDescanso,
+            'orden' => $orden,
+        ];
+
+        $error = $this->validarDetalle($datos);
+
+        if ($error !== null) {
+            $this->render('editarEjercicio', [
+                'error' => $error,
+                'rutina' => $rutina,
+                'detalle' => ['id_detalle' => $idDetalle, ...$datos],
+                'ejercicios' => $this->ejercicioModelo->listarTodos(),
+                'dias' => self::DIAS_SEMANA,
+            ]);
+            return;
+        }
+
+        $this->detalleModelo->actualizar($idDetalle, $idRutina, $datos);
+
+        $this->redirect('rutina', 'asignar', ['id' => $idRutina]);
+    }
+
     /** Quita un ejercicio de la rutina. */
     public function quitarEjercicio(): void
     {
         $this->requireRole(['instructor']);
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('rutina', 'index');
             return;
         }
 
-        $idRutina = (int) input('id_rutina', 0);
+        $idRutina = $_POST['id_rutina'] ?? $_GET['id_rutina'] ?? 0;
+        if (is_string($idRutina)) { $idRutina = trim($idRutina); }
+        $idRutina = (int) $idRutina;
         $rutina = $this->rutinaModelo->buscarPorId($idRutina);
 
         if ($rutina && $this->esPropietario($rutina)) {
-            $idDetalle = (int) input('id_detalle', 0);
+            $idDetalle = $_POST['id_detalle'] ?? $_GET['id_detalle'] ?? 0;
+        if (is_string($idDetalle)) { $idDetalle = trim($idDetalle); }
+        $idDetalle = (int) $idDetalle;
             $this->detalleModelo->eliminar($idDetalle, $idRutina);
         }
 
@@ -304,6 +476,10 @@ class RutinaController
             return 'Las series y las repeticiones deben ser mayores a 0.';
         }
 
+        if ($datos['peso'] !== null && $datos['peso'] < 0) {
+            return 'El peso no puede ser negativo.';
+        }
+
         if ($datos['tiempo_descanso'] < 0) {
             return 'El tiempo de descanso no puede ser negativo.';
         }
@@ -350,7 +526,7 @@ class RutinaController
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */
     private function redirect(string $controlador, string $accion = 'index', array $parametros = []): void
     {
-        header('Location: ' . url($controlador, $accion, $parametros));
+        header('Location: ' . '/index.php?' . http_build_query(array_merge(['controller' => $controlador, 'action' => $accion], $parametros)));
         exit;
     }
 }

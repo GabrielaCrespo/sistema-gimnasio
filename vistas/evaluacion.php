@@ -458,20 +458,24 @@ $datos = $datos ?? [];
         Gimnasio
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('login') ?>">Inicio</a>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
-            <a href="<?= url('evaluacionFisica', 'registrar') ?>" class="<?= $accion === 'registrar' ? 'activo' : '' ?>">Registrar evaluación</a>
-            <a href="<?= url('rutina') ?>">Rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>" class="<?= $accion === 'registrar' ? 'activo' : '' ?>">Registrar evaluación</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
         <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-            <a href="<?= url('rutina') ?>">Mis rutinas</a>
-            <a href="<?= url('evaluacionFisica', 'historial') ?>" class="activo">Mis evaluaciones</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>" class="activo">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('usuario', 'perfil') ?>">Mi perfil</a>
-        <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
+        <?php if ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php endif; ?>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
 
@@ -487,18 +491,18 @@ $datos = $datos ?? [];
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario formulario-ancho" method="post" action="<?= url('evaluacionFisica', 'guardar') ?>">
+        <form class="formulario formulario-ancho" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'guardar']) ?>">
             <div class="campo">
                 <label for="id_cliente">Cliente a evaluar</label>
                 <select id="id_cliente" name="id_cliente" required>
                     <option value="">Selecciona un cliente</option>
                     <?php foreach ($clientes as $cliente): ?>
-                        <option value="<?= e($cliente['id_usuario']) ?>" <?= (int) ($datos['id_cliente'] ?? 0) === (int) $cliente['id_usuario'] ? 'selected' : '' ?>>
-                            <?= e($cliente['nombres'] . ' ' . $cliente['apellidos']) ?>
+                        <option value="<?= htmlspecialchars((string) $cliente['id_cliente'], ENT_QUOTES, 'UTF-8') ?>" <?= (int) ($datos['id_cliente'] ?? 0) === (int) $cliente['id_cliente'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -507,37 +511,37 @@ $datos = $datos ?? [];
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="peso">Peso corporal (kg)</label>
-                    <input type="number" step="0.01" id="peso" name="peso" placeholder="Ej: 72.50" value="<?= e($datos['peso'] ?? '') ?>" required>
+                    <input type="number" step="0.01" id="peso" name="peso" placeholder="Ej: 72.50" value="<?= htmlspecialchars((string) ($datos['peso'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="altura">Estatura / Altura (m)</label>
-                    <input type="number" step="0.01" id="altura" name="altura" placeholder="Ej: 1.75" value="<?= e($datos['altura'] ?? '') ?>" required>
+                    <input type="number" step="0.01" id="altura" name="altura" placeholder="Ej: 1.75" value="<?= htmlspecialchars((string) ($datos['altura'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="porcentaje_grasa">% Grasa corporal</label>
-                    <input type="number" step="0.01" id="porcentaje_grasa" name="porcentaje_grasa" placeholder="Ej: 16.5" value="<?= e($datos['porcentaje_grasa'] ?? '') ?>">
+                    <input type="number" step="0.01" id="porcentaje_grasa" name="porcentaje_grasa" placeholder="Ej: 16.5" value="<?= htmlspecialchars((string) ($datos['porcentaje_grasa'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
                 <div class="campo">
                     <label for="masa_muscular">Masa muscular (kg)</label>
-                    <input type="number" step="0.01" id="masa_muscular" name="masa_muscular" placeholder="Ej: 34.2" value="<?= e($datos['masa_muscular'] ?? '') ?>">
+                    <input type="number" step="0.01" id="masa_muscular" name="masa_muscular" placeholder="Ej: 34.2" value="<?= htmlspecialchars((string) ($datos['masa_muscular'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
                 <div class="campo">
                     <label for="flexibilidad">Flexibilidad (cm)</label>
-                    <input type="number" step="0.01" id="flexibilidad" name="flexibilidad" placeholder="Ej: 5.0" value="<?= e($datos['flexibilidad'] ?? '') ?>">
+                    <input type="number" step="0.01" id="flexibilidad" name="flexibilidad" placeholder="Ej: 5.0" value="<?= htmlspecialchars((string) ($datos['flexibilidad'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
 
             <div class="campo">
                 <label for="objetivo">Objetivo principal</label>
-                <input type="text" id="objetivo" name="objetivo" placeholder="Ej: Hipertrofia, recomposición corporal, pérdida de grasa..." value="<?= e($datos['objetivo'] ?? '') ?>">
+                <input type="text" id="objetivo" name="objetivo" placeholder="Ej: Hipertrofia, recomposición corporal, pérdida de grasa..." value="<?= htmlspecialchars((string) ($datos['objetivo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
             </div>
 
             <div class="campo">
                 <label for="observaciones">Observaciones y notas adicionales</label>
-                <textarea id="observaciones" name="observaciones" rows="3" placeholder="Comentarios clínicos, antecedentes de lesiones o indicaciones dietéticas..."><?= e($datos['observaciones'] ?? '') ?></textarea>
+                <textarea id="observaciones" name="observaciones" rows="3" placeholder="Comentarios clínicos, antecedentes de lesiones o indicaciones dietéticas..."><?= htmlspecialchars((string) ($datos['observaciones'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
 
             <div style="margin-top: 8px;">
@@ -562,16 +566,16 @@ $datos = $datos ?? [];
             </div>
             <div class="tarjetas">
                 <?php foreach ($clientes as $cliente): ?>
-                    <a class="tarjeta" href="<?= url('evaluacionFisica', 'historial', ['id' => $cliente['id_usuario']]) ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial', 'id' => $cliente['id_cliente']]) ?>">
                         <span class="tarjeta-avatar"><?= mb_substr($cliente['nombres'], 0, 1) ?></span>
-                        <span><?= e($cliente['nombres'] . ' ' . $cliente['apellidos']) ?></span>
+                        <span><?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?></span>
                     </a>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="panel-cabecera">
-                <h1>Historial: <?= e($clienteSeleccionado['nombres'] . ' ' . $clienteSeleccionado['apellidos']) ?></h1>
-                <a class="boton boton-secundario" href="<?= url('evaluacionFisica', 'historial') ?>">← Elegir otro cliente</a>
+                <h1>Historial: <?= htmlspecialchars((string) ($clienteSeleccionado['nombres'] . ' ' . $clienteSeleccionado['apellidos']), ENT_QUOTES, 'UTF-8') ?></h1>
+                <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">← Elegir otro cliente</a>
             </div>
         <?php endif; ?>
 
@@ -596,15 +600,15 @@ $datos = $datos ?? [];
                         <tbody>
                             <?php foreach ($evaluaciones as $evaluacion): ?>
                                 <tr>
-                                    <td style="font-weight: 600;"><?= e($evaluacion['fecha']) ?></td>
-                                    <td><span class="badge-dato"><?= e($evaluacion['peso']) ?> kg</span></td>
-                                    <td><?= e($evaluacion['altura']) ?> m</td>
-                                    <td><?= !empty($evaluacion['porcentaje_grasa']) ? e($evaluacion['porcentaje_grasa']) . '%' : '-' ?></td>
-                                    <td><?= !empty($evaluacion['masa_muscular']) ? e($evaluacion['masa_muscular']) . ' kg' : '-' ?></td>
-                                    <td><?= !empty($evaluacion['flexibilidad']) ? e($evaluacion['flexibilidad']) . ' cm' : '-' ?></td>
-                                    <td style="color: var(--color-texto-suave);"><?= e($evaluacion['objetivo'] ?? '-') ?></td>
+                                    <td style="font-weight: 600;"><?= htmlspecialchars((string) $evaluacion['fecha'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><span class="badge-dato"><?= htmlspecialchars((string) $evaluacion['peso'], ENT_QUOTES, 'UTF-8') ?> kg</span></td>
+                                    <td><?= htmlspecialchars((string) $evaluacion['altura'], ENT_QUOTES, 'UTF-8') ?> m</td>
+                                    <td><?= !empty($evaluacion['porcentaje_grasa']) ? htmlspecialchars((string) $evaluacion['porcentaje_grasa'], ENT_QUOTES, 'UTF-8') . '%' : '-' ?></td>
+                                    <td><?= !empty($evaluacion['masa_muscular']) ? htmlspecialchars((string) $evaluacion['masa_muscular'], ENT_QUOTES, 'UTF-8') . ' kg' : '-' ?></td>
+                                    <td><?= !empty($evaluacion['flexibilidad']) ? htmlspecialchars((string) $evaluacion['flexibilidad'], ENT_QUOTES, 'UTF-8') . ' cm' : '-' ?></td>
+                                    <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) ($evaluacion['objetivo'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                                     <td style="font-size: 0.88rem; color: var(--color-texto); font-weight: 500;">
-                                        <?= e($evaluacion['instructor_nombres'] . ' ' . $evaluacion['instructor_apellidos']) ?>
+                                        <?= htmlspecialchars((string) ($evaluacion['instructor_nombres'] . ' ' . $evaluacion['instructor_apellidos']), ENT_QUOTES, 'UTF-8') ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

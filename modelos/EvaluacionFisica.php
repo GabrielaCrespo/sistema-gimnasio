@@ -44,9 +44,9 @@ class EvaluacionFisica
     /** Historial de evaluaciones de un cliente, de la más reciente a la más antigua (CU05). */
     public function listarPorCliente(int $idCliente): array
     {
-        $sql = 'SELECT ef.*, u.nombres AS instructor_nombres, u.apellidos AS instructor_apellidos
+        $sql = 'SELECT ef.*, i.nombres AS instructor_nombres, i.apellidos AS instructor_apellidos
                 FROM EVALUACION_FISICA ef
-                JOIN USUARIO u ON u.id_usuario = ef.id_instructor
+                JOIN INSTRUCTOR i ON i.id_instructor = ef.id_instructor
                 WHERE ef.id_cliente = :id_cliente
                 ORDER BY ef.fecha DESC, ef.id_evaluacion_fisica DESC';
 

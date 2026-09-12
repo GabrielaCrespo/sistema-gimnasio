@@ -288,36 +288,36 @@ $datos = $datos ?? [];
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('login', 'crearCuenta') ?>">
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'crearCuenta']) ?>">
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="nombres">Nombres</label>
-                    <input type="text" id="nombres" name="nombres" value="<?= e($datos['nombres'] ?? '') ?>" placeholder="Ej: Valentina" required>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) ($datos['nombres'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Valentina" required>
                 </div>
                 <div class="campo">
                     <label for="apellidos">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="<?= e($datos['apellidos'] ?? '') ?>" placeholder="Ej: Gómez Rojas" required>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) ($datos['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Gómez Rojas" required>
                 </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="ci">Cédula de identidad</label>
-                    <input type="text" id="ci" name="ci" value="<?= e($datos['ci'] ?? '') ?>" placeholder="Número de documento" required>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) ($datos['ci'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Número de documento" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= e($datos['fecha_nacimiento'] ?? '') ?>" required>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) ($datos['fecha_nacimiento'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" value="<?= e($datos['correo'] ?? '') ?>" placeholder="nombre@ejemplo.com" required>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) ($datos['correo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="nombre@ejemplo.com" required>
             </div>
 
             <div class="fila-formulario">
@@ -334,8 +334,8 @@ $datos = $datos ?? [];
             <button type="submit" class="boton-auth">Crear cuenta</button>
         </form>
 
-        <p class="auth-pie">¿Ya tienes cuenta? <a href="<?= url('login', 'login') ?>">Inicia sesión</a></p>
-        <a href="<?= url('login') ?>" class="auth-volver">← Volver al inicio</a>
+        <p class="auth-pie">¿Ya tienes cuenta? <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'login']) ?>">Inicia sesión</a></p>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>" class="auth-volver">← Volver al inicio</a>
     </section>
 
 <?php else: ?>
@@ -352,11 +352,11 @@ $datos = $datos ?? [];
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('login', 'autenticar') ?>">
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'autenticar']) ?>">
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
                 <input type="email" id="correo" name="correo" placeholder="nombre@ejemplo.com" required autofocus>
@@ -368,8 +368,8 @@ $datos = $datos ?? [];
             <button type="submit" class="boton-auth">Ingresar al sistema</button>
         </form>
 
-        <p class="auth-pie">¿No tienes cuenta? <a href="<?= url('login', 'register') ?>">Regístrate como cliente</a></p>
-        <a href="<?= url('login') ?>" class="auth-volver">← Volver al inicio</a>
+        <p class="auth-pie">¿No tienes cuenta? <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'register']) ?>">Regístrate como cliente</a></p>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>" class="auth-volver">← Volver al inicio</a>
     </section>
 
 <?php endif; ?>

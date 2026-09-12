@@ -13,6 +13,19 @@
 
 declare(strict_types=1);
 
+// Cuando se ejecuta con el servidor embebido de PHP (`php -S`, solo para
+// pruebas locales) se le indica que sirva directamente los archivos
+// estáticos que ya existen en disco -como los videos subidos en /videos/-
+// en vez de pasar por este front controller. En un hosting real
+// (Apache/Nginx) esto no hace falta: el propio servidor ya sirve esos
+// archivos sin tocar index.php.
+if (PHP_SAPI === 'cli-server') {
+    $rutaSolicitada = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($rutaSolicitada !== __DIR__ . '/index.php' && is_file($rutaSolicitada)) {
+        return false;
+    }
+}
+
 session_start();
 
 define('BASE_PATH', __DIR__);

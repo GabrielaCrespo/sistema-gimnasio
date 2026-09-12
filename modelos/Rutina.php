@@ -59,11 +59,11 @@ class Rutina
     public function buscarPorId(int $id): ?array
     {
         $sql = 'SELECT r.*,
-                       uc.nombres AS cliente_nombres, uc.apellidos AS cliente_apellidos,
-                       ui.nombres AS instructor_nombres, ui.apellidos AS instructor_apellidos
+                       c.nombres AS cliente_nombres, c.apellidos AS cliente_apellidos,
+                       i.nombres AS instructor_nombres, i.apellidos AS instructor_apellidos
                 FROM RUTINA r
-                JOIN USUARIO uc ON uc.id_usuario = r.id_cliente
-                JOIN USUARIO ui ON ui.id_usuario = r.id_instructor
+                JOIN CLIENTE c ON c.id_cliente = r.id_cliente
+                JOIN INSTRUCTOR i ON i.id_instructor = r.id_instructor
                 WHERE r.id_rutina = :id';
 
         $sentencia = $this->db->prepare($sql);
@@ -76,9 +76,9 @@ class Rutina
     /** Rutinas asignadas a un cliente (CU06), de la más reciente a la más antigua. */
     public function listarPorCliente(int $idCliente): array
     {
-        $sql = 'SELECT r.*, ui.nombres AS instructor_nombres, ui.apellidos AS instructor_apellidos
+        $sql = 'SELECT r.*, i.nombres AS instructor_nombres, i.apellidos AS instructor_apellidos
                 FROM RUTINA r
-                JOIN USUARIO ui ON ui.id_usuario = r.id_instructor
+                JOIN INSTRUCTOR i ON i.id_instructor = r.id_instructor
                 WHERE r.id_cliente = :id_cliente
                 ORDER BY r.fecha_inicio DESC';
 
@@ -91,9 +91,9 @@ class Rutina
     /** Rutinas creadas por un instructor (CU06), para su panel de gestión. */
     public function listarPorInstructor(int $idInstructor): array
     {
-        $sql = 'SELECT r.*, uc.nombres AS cliente_nombres, uc.apellidos AS cliente_apellidos
+        $sql = 'SELECT r.*, c.nombres AS cliente_nombres, c.apellidos AS cliente_apellidos
                 FROM RUTINA r
-                JOIN USUARIO uc ON uc.id_usuario = r.id_cliente
+                JOIN CLIENTE c ON c.id_cliente = r.id_cliente
                 WHERE r.id_instructor = :id_instructor
                 ORDER BY r.fecha_inicio DESC';
 

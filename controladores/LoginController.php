@@ -4,29 +4,33 @@
  * Controlador de Autenticación (LoginController)
  *
  * CU01: Inicio y cierre de sesión para Administrador, Instructor y Cliente.
- * CU02: Auto-registro de cuentas con rol 'cliente' (sin sesión/parte pública).
+ * Se encarga exclusivamente de autenticación y cierre de sesión: el
+ * auto-registro de clientes (CU02) vive en ClienteController.
  *
  * También sirve la portada/panel de bienvenida (acción index): al no requerir
  * sesión ni modelos propios, no justifica un controlador aparte.
  *
- * Nota: Las cuentas de administrador e instructor solo pueden ser creadas por un
- * administrador desde UsuarioController, no aquí.
+ * No existe una tabla ADMINISTRADOR: la cuenta de administrador es única y
+ * fija, definida por ADMIN_CORREO/ADMIN_PASSWORD_HASH en .env, y se valida
+ * aquí directamente en vez de a través de un modelo.
+ *
+ * Nota: las cuentas de instructor solo pueden ser creadas por el
+ * administrador desde InstructorController, no aquí.
  */
 
 class LoginController
 {
-
-    // Modelos que usaremos para trabajar con usuarios y clientes
-    private Usuario $usuarioModelo;
+    // Modelos que usaremos para trabajar con clientes e instructores.
     private Cliente $clienteModelo;
+    private Instructor $instructorModelo;
 
     /**
-     * Constructor: Crea los objetos para acceder a los datos de usuario y cliente
+     * Constructor: Crea los objetos para acceder a los datos de cliente e instructor.
      */
     public function __construct()
     {
-        $this->usuarioModelo = new Usuario();
         $this->clienteModelo = new Cliente();
+        $this->instructorModelo = new Instructor();
     }
 
     /** Portada pública o panel de bienvenida, según haya sesión activa (ruta por defecto del sistema). */
@@ -51,39 +55,67 @@ class LoginController
      */
     public function autenticar(): void
     {
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('login', 'login');
             return;
         }
 
         //Obtiene los datos del formulario
-        $correo = input('correo', '');
-        $password = input('password', '');
+        $correo = $_POST['correo'] ?? $_GET['correo'] ?? '';
+        if (is_string($correo)) { $correo = trim($correo); }
+        $password = $_POST['password'] ?? $_GET['password'] ?? '';
+        if (is_string($password)) { $password = trim($password); }
 
-        // Pide al modelo Usuario que verifique las credenciales
-        $usuario = $this->usuarioModelo->verificarCredenciales($correo, $password);
+        // Se prueba primero contra la cuenta fija de administrador (no vive en ninguna tabla).
+        $datosSesion = $this->verificarAdministrador($correo, $password);
 
-        //Si el modelo devuelve false, vuelve a la vista de login con un mensaje de error
-        if (!$usuario) {
-            $this->render('login', ['error' => 'Correo o contraseña incorrectos.']);
-            return;
+        // Si no es el administrador, se prueba contra CLIENTE y luego contra INSTRUCTOR.
+        if ($datosSesion === null) {
+            $cliente = $this->clienteModelo->verificarCredenciales($correo, $password);
+
+            if ($cliente !== null) {
+                if (!$cliente['estado']) {
+                    $this->render('login', ['error' => 'Esta cuenta está inactiva. Contacta al administrador.']);
+                    return;
+                }
+
+                $datosSesion = [
+                    'id' => $cliente['id_cliente'],
+                    'nombre' => $cliente['nombres'] . ' ' . $cliente['apellidos'],
+                    'correo' => $cliente['correo'],
+                    'rol' => 'cliente',
+                ];
+            }
         }
 
-        if (!$usuario['estado']) {
-            $this->render('login', ['error' => 'Esta cuenta está inactiva. Contacta al administrador.']);
+        if ($datosSesion === null) {
+            $instructor = $this->instructorModelo->verificarCredenciales($correo, $password);
+
+            if ($instructor !== null) {
+                if (!$instructor['estado']) {
+                    $this->render('login', ['error' => 'Esta cuenta está inactiva. Contacta al administrador.']);
+                    return;
+                }
+
+                $datosSesion = [
+                    'id' => $instructor['id_instructor'],
+                    'nombre' => $instructor['nombres'] . ' ' . $instructor['apellidos'],
+                    'correo' => $instructor['correo'],
+                    'rol' => 'instructor',
+                ];
+            }
+        }
+
+        // Ninguna de las tres fuentes reconoció las credenciales.
+        if ($datosSesion === null) {
+            $this->render('login', ['error' => 'Correo o contraseña incorrectos.']);
             return;
         }
 
         // Regenera ID de sesion por seguridad
         session_regenerate_id(true);
 
-        // Guarda los datos del usuario en la sesión
-        $_SESSION['user'] = [
-            'id' => $usuario['id_usuario'],
-            'nombre' => $usuario['nombres'] . ' ' . $usuario['apellidos'],
-            'correo' => $usuario['correo'],
-            'rol' => $usuario['rol'],
-        ];
+        $_SESSION['user'] = $datosSesion;
 
         $this->redirect('login');
     }
@@ -96,90 +128,26 @@ class LoginController
         $this->redirect('login');
     }
 
-    /** Muestra la vista de auto-registro público (siempre crea una cuenta de tipo cliente). */
-    public function register(): void
+    /**
+     * Comprueba si el correo/contraseña corresponden al administrador fijo
+     * definido en .env. Devuelve los datos listos para la sesión, o null si
+     * no coinciden (para que autenticar() siga probando con CLIENTE/INSTRUCTOR).
+     */
+    private function verificarAdministrador(string $correo, string $password): ?array
     {
-        // Si ya hay una sesión activa redirije a la portada
-        if (!empty($_SESSION['user'])) {
-            $this->redirect('login');
+        $correoAdmin = Config::get('ADMIN_CORREO', '');
+        $hashAdmin = Config::get('ADMIN_PASSWORD_HASH', '');
+
+        if ($correoAdmin === '' || $correo !== $correoAdmin || !password_verify($password, $hashAdmin)) {
+            return null;
         }
 
-        // Envía a la vista de registro con datos vacíos y sin error
-        $this->render('register', ['error' => null, 'datos' => []]);
-    }
-
-    // Procesa el formulario de registro de un nuevo cliente
-    public function crearCuenta(): void
-    {
-        if (!esPost()) {
-            $this->redirect('login', 'register');
-            return;
-        }
-
-        // Obtiene los datos del formulario
-        $datos = [
-            'ci' => input('ci', ''),
-            'nombres' => input('nombres', ''),
-            'apellidos' => input('apellidos', ''),
-            'fecha_nacimiento' => input('fecha_nacimiento', ''),
-            'correo' => input('correo', ''),
+        return [
+            'id' => 0,
+            'nombre' => 'Administrador',
+            'correo' => $correoAdmin,
+            'rol' => 'administrador',
         ];
-        $password = input('password', '');
-        $passwordConfirmacion = input('password_confirmacion', '');
-
-        // Valida los datos del registro
-        $error = $this->validarRegistro($datos, $password, $passwordConfirmacion);
-
-        if ($error !== null) {
-            $this->render('register', ['error' => $error, 'datos' => $datos]);
-            return;
-        }
-
-        // Pide al modelo Usuario que cree la cuenta con el rol cliente
-        $idUsuario = $this->usuarioModelo->crear([
-            ...$datos,
-            'password' => $password,
-            'rol' => 'cliente',
-        ]);
-
-       // Pide al modelo Cliente que cree el registro correspondiente en la tabla clientes
-        $this->clienteModelo->crear($idUsuario, null, null);
-
-        // Redirige a la página de login con un mensaje de éxito
-        $this->redirect('login', 'login');
-    }
-
-    /** Valida los datos del formulario de registro; devuelve el mensaje de error o null si todo está correcto. */
-    private function validarRegistro(array $datos, string $password, string $passwordConfirmacion): ?string
-    {
-        foreach (['ci', 'nombres', 'apellidos', 'fecha_nacimiento', 'correo'] as $campo) {
-            if ($datos[$campo] === '') {
-                return 'Todos los campos son obligatorios.';
-            }
-        }
-
-        if (!filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
-            return 'El correo electrónico no es válido.';
-        }
-
-        if (strlen($password) < 6) {
-            return 'La contraseña debe tener al menos 6 caracteres.';
-        }
-
-        if ($password !== $passwordConfirmacion) {
-            return 'Las contraseñas no coinciden.';
-        }
-
-        if ($this->usuarioModelo->existeCorreo($datos['correo'])) {
-            return 'Ya existe una cuenta registrada con ese correo.';
-        }
-
-        if ($this->usuarioModelo->existeCi($datos['ci'])) {
-            return 'Ya existe una cuenta registrada con ese CI.';
-        }
-
-        // Si todo está correcto, devuelve null
-        return null;
     }
 
     /** Muestra la vista de login/registro (vistas/login.php decide el contenido según $accion). */
@@ -192,7 +160,7 @@ class LoginController
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */
     private function redirect(string $controlador, string $accion = 'index', array $parametros = []): void
     {
-        header('Location: ' . url($controlador, $accion, $parametros));
+        header('Location: ' . '/index.php?' . http_build_query(array_merge(['controller' => $controlador, 'action' => $accion], $parametros)));
         exit;
     }
 }

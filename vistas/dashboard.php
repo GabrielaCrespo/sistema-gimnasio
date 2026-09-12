@@ -383,24 +383,29 @@ $usuarioSesion = $_SESSION['user'] ?? null;
             Gimnasio
         </div>
         <div class="nav-enlaces">
-            <a href="<?= url('login') ?>">Inicio</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
             <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-                <a href="<?= url('usuario') ?>">Usuarios</a>
-                <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-                <a href="<?= url('ejercicio') ?>">Ejercicios</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">Clientes</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">Instructores</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
             <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-                <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-                <a href="<?= url('ejercicio') ?>">Ejercicios</a>
-                <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-                <a href="<?= url('rutina') ?>">Rutinas</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
             <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-                <a href="<?= url('rutina') ?>">Mis rutinas</a>
-                <a href="<?= url('evaluacionFisica', 'historial') ?>">Mis evaluaciones</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Mis evaluaciones</a>
             <?php endif; ?>
         </div>
         <div class="nav-enlaces">
-            <a href="<?= url('usuario', 'perfil') ?>">Mi perfil</a>
-            <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
+            <?php if ($usuarioSesion['rol'] === 'cliente'): ?>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'perfil']) ?>">Mi perfil</a>
+            <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>">Mi perfil</a>
+            <?php endif; ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
         </div>
     </nav>
 <?php endif; ?>
@@ -410,47 +415,51 @@ $usuarioSesion = $_SESSION['user'] ?? null;
         <?php if ($usuarioSesion): ?>
             <div class="perfil-badge">
                 <span class="perfil-badge-punto"></span>
-                Rol: <?= e(ucfirst($usuarioSesion['rol'])) ?>
+                Rol: <?= htmlspecialchars((string) (ucfirst($usuarioSesion['rol'])), ENT_QUOTES, 'UTF-8') ?>
             </div>
             
             <div class="landing-header">
-                <h1>Hola de nuevo, <span><?= e($usuarioSesion['nombre']) ?></span> ✨</h1>
+                <h1>Hola de nuevo, <span><?= htmlspecialchars((string) $usuarioSesion['nombre'], ENT_QUOTES, 'UTF-8') ?></span> ✨</h1>
                 <p>Bienvenido al panel de gestión. Accede rápidamente a tus módulos principales a continuación.</p>
             </div>
 
             <div class="tarjetas">
                 <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-                    <a class="tarjeta" href="<?= url('usuario') ?>">
-                        <span>Gestionar usuarios</span>
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">
+                        <span>Gestionar clientes</span>
                         <span class="flecha">→</span>
                     </a>
-                    <a class="tarjeta" href="<?= url('grupoMuscular') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">
+                        <span>Gestionar instructores</span>
+                        <span class="flecha">→</span>
+                    </a>
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">
                         <span>Grupos musculares</span>
                         <span class="flecha">→</span>
                     </a>
-                    <a class="tarjeta" href="<?= url('ejercicio') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">
                         <span>Catálogo de ejercicios</span>
                         <span class="flecha">→</span>
                     </a>
                 <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-                    <a class="tarjeta" href="<?= url('evaluacionFisica', 'registrar') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">
                         <span>Registrar evaluación</span>
                         <span class="flecha">→</span>
                     </a>
-                    <a class="tarjeta" href="<?= url('rutina') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">
                         <span>Gestionar rutinas</span>
                         <span class="flecha">→</span>
                     </a>
-                    <a class="tarjeta" href="<?= url('ejercicio') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">
                         <span>Catálogo de ejercicios</span>
                         <span class="flecha">→</span>
                     </a>
                 <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-                    <a class="tarjeta" href="<?= url('rutina') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">
                         <span>Mis rutinas activas</span>
                         <span class="flecha">→</span>
                     </a>
-                    <a class="tarjeta" href="<?= url('evaluacionFisica', 'historial') ?>">
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">
                         <span>Historial de evaluaciones</span>
                         <span class="flecha">→</span>
                     </a>
@@ -463,10 +472,10 @@ $usuarioSesion = $_SESSION['user'] ?? null;
                 <p>Una plataforma moderna y sencilla para gestionar rutinas, control de socios, progresos físicos y ejercicios de entrenamiento.</p>
             </div>
             <div class="landing-acciones">
-                <a class="boton" href="<?= url('login', 'login') ?>">
+                <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'login']) ?>">
                     Iniciar sesión
                 </a>
-                <a class="boton boton-secundario" href="<?= url('login', 'register') ?>">
+                <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'register']) ?>">
                     Crear cuenta
                 </a>
             </div>

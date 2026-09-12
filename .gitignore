@@ -9,6 +9,10 @@
 /storage/logs/*
 *.log
 
+# VIDEOS LOCALES DE EJERCICIOS (subidos por el administrador/instructor)
+/videos/*
+!/videos/.gitkeep
+
 # ARCHIVOS TEMPORALES
 *.tmp
 *.temp

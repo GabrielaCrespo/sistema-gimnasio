@@ -8,6 +8,15 @@
  */
 class EjercicioController
 {
+    /** Extensiones de video local aceptadas al subir el archivo de un ejercicio. */
+    private const EXTENSIONES_VIDEO_PERMITIDAS = ['mp4', 'webm', 'ogg', 'mov'];
+
+    /** Tamaño máximo aceptado para el archivo de video (100 MB). */
+    private const TAMANO_MAXIMO_VIDEO = 100 * 1024 * 1024;
+
+    /** Carpeta local (fuera del control de versiones) donde se guardan los videos subidos. */
+    private const CARPETA_VIDEOS = BASE_PATH . '/videos/';
+
     private Ejercicio $ejercicioModelo;
     private GrupoMuscular $grupoMuscularModelo;
     private EjercicioGrupoMuscular $ejercicioGrupoModelo;
@@ -19,6 +28,7 @@ class EjercicioController
         $this->ejercicioGrupoModelo = new EjercicioGrupoMuscular();
     }
 
+    /** Acceso de gestión del catálogo (crear/editar/eliminar): solo administrador e instructor. */
     private function verificarAcceso(): void
     {
         $this->requireRole(['administrador', 'instructor']);
@@ -32,11 +42,14 @@ class EjercicioController
         $this->render('listar', ['ejercicios' => $ejercicios, 'error' => null]);
     }
 
+    /** El detalle de un ejercicio también lo puede consultar el cliente, para ver sus instrucciones, beneficios y video. */
     public function ver(): void
     {
-        $this->verificarAcceso();
+        $this->requireRole(['administrador', 'instructor', 'cliente']);
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $ejercicio = $this->ejercicioModelo->buscarPorId($id);
 
         if (!$ejercicio) {
@@ -64,7 +77,7 @@ class EjercicioController
     {
         $this->verificarAcceso();
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('ejercicio', 'crear');
             return;
         }
@@ -72,7 +85,8 @@ class EjercicioController
         $datos = $this->datosFormulario();
         $gruposSeleccionados = array_map('intval', $_POST['grupos'] ?? []);
 
-        $error = $this->validar($datos['nombre'], null);
+        [$video, $errorVideo] = $this->procesarVideo(null);
+        $error = $errorVideo ?? $this->validar($datos['nombre'], null);
 
         if ($error !== null) {
             $this->render('crear', [
@@ -84,6 +98,8 @@ class EjercicioController
             return;
         }
 
+        $datos['url_video'] = $video;
+
         $idEjercicio = $this->ejercicioModelo->crear($datos);
         $this->ejercicioGrupoModelo->asociar($idEjercicio, $gruposSeleccionados);
 
@@ -94,7 +110,9 @@ class EjercicioController
     {
         $this->verificarAcceso();
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $ejercicio = $this->ejercicioModelo->buscarPorId($id);
 
         if (!$ejercicio) {
@@ -116,7 +134,9 @@ class EjercicioController
     {
         $this->verificarAcceso();
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
         $ejercicioExistente = $this->ejercicioModelo->buscarPorId($id);
 
         if (!$ejercicioExistente) {
@@ -127,17 +147,20 @@ class EjercicioController
         $datos = $this->datosFormulario();
         $gruposSeleccionados = array_map('intval', $_POST['grupos'] ?? []);
 
-        $error = $this->validar($datos['nombre'], $id);
+        [$video, $errorVideo] = $this->procesarVideo($ejercicioExistente['url_video']);
+        $error = $errorVideo ?? $this->validar($datos['nombre'], $id);
 
         if ($error !== null) {
             $this->render('editar', [
                 'error' => $error,
-                'ejercicio' => ['id_ejercicio' => $id, ...$datos],
+                'ejercicio' => ['id_ejercicio' => $id, ...$datos, 'url_video' => $ejercicioExistente['url_video']],
                 'gruposDisponibles' => $this->grupoMuscularModelo->listarTodos(),
                 'gruposSeleccionados' => $gruposSeleccionados,
             ]);
             return;
         }
+
+        $datos['url_video'] = $video;
 
         $this->ejercicioModelo->actualizar($id, $datos);
         $this->ejercicioGrupoModelo->asociar($id, $gruposSeleccionados);
@@ -149,12 +172,14 @@ class EjercicioController
     {
         $this->verificarAcceso();
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('ejercicio', 'index');
             return;
         }
 
-        $id = (int) input('id', 0);
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
 
         if (!$this->ejercicioModelo->eliminar($id)) {
             // El ejercicio ya forma parte de alguna rutina (DETALLE_RUTINA
@@ -169,16 +194,70 @@ class EjercicioController
         $this->redirect('ejercicio', 'index');
     }
 
-    /** Extrae y normaliza los campos del formulario de ejercicio (crear o editar). */
+    /** Extrae y normaliza los campos del formulario de ejercicio (crear o editar). El video se procesa aparte, ver procesarVideo(). */
     private function datosFormulario(): array
     {
+        $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
+        if (is_string($nombre)) { $nombre = trim($nombre); }
+        $descripcion = $_POST['descripcion'] ?? $_GET['descripcion'] ?? '';
+        if (is_string($descripcion)) { $descripcion = trim($descripcion); }
+        $beneficio = $_POST['beneficio'] ?? $_GET['beneficio'] ?? '';
+        if (is_string($beneficio)) { $beneficio = trim($beneficio); }
+        $indicaciones = $_POST['indicaciones'] ?? $_GET['indicaciones'] ?? '';
+        if (is_string($indicaciones)) { $indicaciones = trim($indicaciones); }
+
         return [
-            'nombre' => input('nombre', ''),
-            'descripcion' => input('descripcion', '') ?: null,
-            'beneficio' => input('beneficio', '') ?: null,
-            'indicaciones' => input('indicaciones', '') ?: null,
-            'url_video' => input('url_video', '') ?: null,
+            'nombre' => $nombre,
+            'descripcion' => $descripcion ?: null,
+            'beneficio' => $beneficio ?: null,
+            'indicaciones' => $indicaciones ?: null,
         ];
+    }
+
+    /**
+     * Procesa el archivo de video local subido en el campo "video" del formulario.
+     * Si no se subió un archivo nuevo, conserva $videoActual (el que ya tenía el
+     * ejercicio al editar, o null al crear uno nuevo). Devuelve [nombreDeArchivo, error].
+     */
+    private function procesarVideo(?string $videoActual): array
+    {
+        if (!isset($_FILES['video']) || $_FILES['video']['error'] === UPLOAD_ERR_NO_FILE) {
+            return [$videoActual, null];
+        }
+
+        if ($_FILES['video']['error'] !== UPLOAD_ERR_OK) {
+            return [$videoActual, match ($_FILES['video']['error']) {
+                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE =>
+                    'El video supera el tamaño máximo permitido por la configuración actual del servidor (upload_max_filesize/post_max_size en php.ini). Pide al administrador del servidor que los aumente.',
+                UPLOAD_ERR_PARTIAL => 'El video se subió solo parcialmente. Revisa tu conexión e inténtalo de nuevo.',
+                UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION =>
+                    'El servidor no pudo procesar el archivo subido. Inténtalo de nuevo más tarde.',
+                default => 'Ocurrió un error al subir el video. Inténtalo de nuevo.',
+            }];
+        }
+
+        if ($_FILES['video']['size'] > self::TAMANO_MAXIMO_VIDEO) {
+            return [$videoActual, 'El video no puede superar los 100 MB.'];
+        }
+
+        $extension = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($extension, self::EXTENSIONES_VIDEO_PERMITIDAS, true)) {
+            return [$videoActual, 'El video debe ser un archivo MP4, WEBM, OGG o MOV.'];
+        }
+
+        if (!is_dir(self::CARPETA_VIDEOS) && !mkdir(self::CARPETA_VIDEOS, 0755, true) && !is_dir(self::CARPETA_VIDEOS)) {
+            return [$videoActual, 'No se pudo preparar el almacenamiento de videos en el servidor.'];
+        }
+
+        // Nombre aleatorio para evitar colisiones y no depender del nombre original del archivo.
+        $nombreArchivo = bin2hex(random_bytes(16)) . '.' . $extension;
+
+        if (!move_uploaded_file($_FILES['video']['tmp_name'], self::CARPETA_VIDEOS . $nombreArchivo)) {
+            return [$videoActual, 'No se pudo guardar el video en el servidor.'];
+        }
+
+        return [$nombreArchivo, null];
     }
 
     /** El nombre es obligatorio y único en el catálogo (coincide con la restricción UNIQUE de la tabla). */
@@ -234,7 +313,7 @@ class EjercicioController
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */
     private function redirect(string $controlador, string $accion = 'index', array $parametros = []): void
     {
-        header('Location: ' . url($controlador, $accion, $parametros));
+        header('Location: ' . '/index.php?' . http_build_query(array_merge(['controller' => $controlador, 'action' => $accion], $parametros)));
         exit;
     }
 }

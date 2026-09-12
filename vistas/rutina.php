@@ -509,20 +509,24 @@ $datos = $datos ?? [];
         Gimnasio
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('login') ?>">Inicio</a>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
-            <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-            <a href="<?= url('rutina') ?>" class="activo">Rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>" class="activo">Rutinas</a>
         <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-            <a href="<?= url('rutina') ?>" class="activo">Mis rutinas</a>
-            <a href="<?= url('evaluacionFisica', 'historial') ?>">Mis evaluaciones</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>" class="activo">Mis rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('usuario', 'perfil') ?>">Mi perfil</a>
-        <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
+        <?php if ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php endif; ?>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
 <?php endif; ?>
@@ -535,7 +539,7 @@ $datos = $datos ?? [];
         <div class="panel-cabecera">
             <h1><?= $rol === 'instructor' ? 'Rutinas Creadas' : 'Mis Rutinas de Entrenamiento' ?></h1>
             <?php if ($rol === 'instructor'): ?>
-                <a class="boton" href="<?= url('rutina', 'crear') ?>">
+                <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'crear']) ?>">
                     <span>+ Nueva rutina</span>
                 </a>
             <?php endif; ?>
@@ -566,22 +570,22 @@ $datos = $datos ?? [];
                             };
                         ?>
                             <tr>
-                                <td style="font-weight: 600; color: var(--color-texto);"><?= e($rutina['nombre']) ?></td>
-                                <td style="color: var(--color-texto-suave);"><?= e($rutina['tipo'] ?? '-') ?></td>
+                                <td style="font-weight: 600; color: var(--color-texto);"><?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) ($rutina['tipo'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                                 <td style="font-weight: 500;">
                                     <?= $rol === 'instructor'
-                                        ? e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos'])
-                                        : e($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']) ?>
+                                        ? htmlspecialchars((string) ($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']), ENT_QUOTES, 'UTF-8')
+                                        : htmlspecialchars((string) ($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']), ENT_QUOTES, 'UTF-8') ?>
                                 </td>
-                                <td><?= e($rutina['fecha_inicio']) ?></td>
-                                <td><?= e($rutina['fecha_fin'] ?? 'Indefinida') ?></td>
-                                <td><span class="insignia <?= $claseEstado ?>"><?= e(ucfirst($rutina['estado'])) ?></span></td>
+                                <td><?= htmlspecialchars((string) $rutina['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars((string) ($rutina['fecha_fin'] ?? 'Indefinida'), ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><span class="insignia <?= $claseEstado ?>"><?= htmlspecialchars((string) (ucfirst($rutina['estado'])), ENT_QUOTES, 'UTF-8') ?></span></td>
                                 <td>
                                     <div class="acciones" style="justify-content: flex-end;">
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver</a>
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'ver', 'id' => $rutina['id_rutina']]) ?>">Ver</a>
                                         <?php if ($rol === 'instructor'): ?>
-                                            <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'editar', ['id' => $rutina['id_rutina']]) ?>">Editar</a>
-                                            <a class="boton boton-pequeno boton-secundario" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Ejercicios</a>
+                                            <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'editar', 'id' => $rutina['id_rutina']]) ?>">Editar</a>
+                                            <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'asignar', 'id' => $rutina['id_rutina']]) ?>">Ejercicios</a>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -598,12 +602,12 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <div>
-                <h1><?= e($rutina['nombre']) ?></h1>
+                <h1><?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?></h1>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+                <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">← Volver</a>
                 <?php if ((int) $rutina['id_instructor'] === (int) ($_SESSION['user']['id'] ?? 0)): ?>
-                    <a class="boton" href="<?= url('rutina', 'asignar', ['id' => $rutina['id_rutina']]) ?>">Gestionar ejercicios</a>
+                    <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'asignar', 'id' => $rutina['id_rutina']]) ?>">Gestionar ejercicios</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -619,24 +623,24 @@ $datos = $datos ?? [];
         <div class="resumen-grid">
             <div class="resumen-card">
                 <strong>Cliente</strong>
-                <span><?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></span>
+                <span><?= htmlspecialchars((string) ($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="resumen-card">
                 <strong>Instructor</strong>
-                <span><?= e($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']) ?></span>
+                <span><?= htmlspecialchars((string) ($rutina['instructor_nombres'] . ' ' . $rutina['instructor_apellidos']), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="resumen-card">
                 <strong>Enfoque / Tipo</strong>
-                <span><?= e($rutina['tipo'] ?? 'General') ?></span>
+                <span><?= htmlspecialchars((string) ($rutina['tipo'] ?? 'General'), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="resumen-card">
                 <strong>Periodo</strong>
-                <span><?= e($rutina['fecha_inicio']) ?> al <?= e($rutina['fecha_fin'] ?? 'indefinido') ?></span>
+                <span><?= htmlspecialchars((string) $rutina['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?> al <?= htmlspecialchars((string) ($rutina['fecha_fin'] ?? 'indefinido'), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="resumen-card">
                 <strong>Estado actual</strong>
                 <div>
-                    <span class="insignia <?= $claseEstado ?>"><?= e(ucfirst($rutina['estado'])) ?></span>
+                    <span class="insignia <?= $claseEstado ?>"><?= htmlspecialchars((string) (ucfirst($rutina['estado'])), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
             </div>
         </div>
@@ -648,7 +652,7 @@ $datos = $datos ?? [];
                 <div class="subseccion-tarjeta">
                     <h2 class="subseccion-titulo">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primario);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <?= e($dia) ?>
+                        <?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?>
                     </h2>
                     <div class="tabla-envoltura" style="margin-top: 0;">
                         <table>
@@ -657,16 +661,18 @@ $datos = $datos ?? [];
                                     <th>Ejercicio</th>
                                     <th>Series</th>
                                     <th>Repeticiones</th>
+                                    <th>Peso</th>
                                     <th>Descanso entre series</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($ejercicios as $fila): ?>
                                     <tr>
-                                        <td style="font-weight: 600;"><?= e($fila['ejercicio_nombre']) ?></td>
-                                        <td><?= e($fila['series']) ?></td>
-                                        <td><?= e($fila['repeticiones']) ?></td>
-                                        <td><span style="font-weight: 600; color: var(--color-primario);"><?= e($fila['tiempo_descanso']) ?>s</span></td>
+                                        <td style="font-weight: 600;"><a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'ver', 'id' => $fila['id_ejercicio']]) ?>"><?= htmlspecialchars((string) $fila['ejercicio_nombre'], ENT_QUOTES, 'UTF-8') ?></a></td>
+                                        <td><?= htmlspecialchars((string) $fila['series'], ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= htmlspecialchars((string) $fila['repeticiones'], ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= $fila['peso'] !== null ? htmlspecialchars((string) $fila['peso'], ENT_QUOTES, 'UTF-8') . ' kg' : '—' ?></td>
+                                        <td><span style="font-weight: 600; color: var(--color-primario);"><?= htmlspecialchars((string) $fila['tiempo_descanso'], ENT_QUOTES, 'UTF-8') ?>s</span></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -682,44 +688,44 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Nueva Rutina</h1>
-            <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('rutina', 'guardar') ?>">
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'guardar']) ?>">
             <div class="campo">
                 <label for="id_cliente">Asignar a cliente</label>
                 <select id="id_cliente" name="id_cliente" required>
                     <option value="">Selecciona un cliente</option>
                     <?php foreach ($clientes as $cliente): ?>
-                        <option value="<?= e($cliente['id_usuario']) ?>" <?= (int) ($datos['id_cliente'] ?? 0) === (int) $cliente['id_usuario'] ? 'selected' : '' ?>>
-                            <?= e($cliente['nombres'] . ' ' . $cliente['apellidos']) ?>
+                        <option value="<?= htmlspecialchars((string) $cliente['id_cliente'], ENT_QUOTES, 'UTF-8') ?>" <?= (int) ($datos['id_cliente'] ?? 0) === (int) $cliente['id_cliente'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="campo">
                 <label for="nombre">Nombre descriptivo de la rutina</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" placeholder="Ej: Torso - Pierna 4 días" required>
+                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) ($datos['nombre'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Torso - Pierna 4 días" required>
             </div>
             <div class="campo">
                 <label for="tipo">Tipo o Enfoque</label>
-                <input type="text" id="tipo" name="tipo" value="<?= e($datos['tipo'] ?? '') ?>" placeholder="Ej: Hipertrofia, Fuerza, Pérdida de grasa">
+                <input type="text" id="tipo" name="tipo" value="<?= htmlspecialchars((string) ($datos['tipo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Hipertrofia, Fuerza, Pérdida de grasa">
             </div>
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="fecha_inicio">Fecha de inicio</label>
-                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?= e($datos['fecha_inicio'] ?? '') ?>" required>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?= htmlspecialchars((string) ($datos['fecha_inicio'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_fin">Fecha de fin (opcional)</label>
-                    <input type="date" id="fecha_fin" name="fecha_fin" value="<?= e($datos['fecha_fin'] ?? '') ?>">
+                    <input type="date" id="fecha_fin" name="fecha_fin" value="<?= htmlspecialchars((string) ($datos['fecha_fin'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
             <div style="margin-top: 10px;">
@@ -733,34 +739,34 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Editar Rutina</h1>
-            <a class="boton boton-secundario" href="<?= url('rutina', 'index') ?>">← Volver</a>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('rutina', 'actualizar') ?>">
-            <input type="hidden" name="id" value="<?= e($rutina['id_rutina']) ?>">
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'actualizar']) ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
             <div class="campo">
                 <label for="nombre">Nombre de la rutina</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($rutina['nombre']) ?>" required>
+                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
             <div class="campo">
                 <label for="tipo">Tipo o Enfoque</label>
-                <input type="text" id="tipo" name="tipo" value="<?= e($rutina['tipo'] ?? '') ?>">
+                <input type="text" id="tipo" name="tipo" value="<?= htmlspecialchars((string) ($rutina['tipo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
             </div>
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="fecha_inicio">Fecha de inicio</label>
-                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?= e($rutina['fecha_inicio']) ?>" required>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?= htmlspecialchars((string) $rutina['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_fin">Fecha de fin (opcional)</label>
-                    <input type="date" id="fecha_fin" name="fecha_fin" value="<?= e($rutina['fecha_fin'] ?? '') ?>">
+                    <input type="date" id="fecha_fin" name="fecha_fin" value="<?= htmlspecialchars((string) ($rutina['fecha_fin'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
             <div class="campo">
@@ -782,16 +788,16 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <div>
-                <h1>Ejercicios de "<?= e($rutina['nombre']) ?>"</h1>
-                <p class="texto-suave">Cliente: <strong><?= e($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']) ?></strong></p>
+                <h1>Ejercicios de "<?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?>"</h1>
+                <p class="texto-suave">Cliente: <strong><?= htmlspecialchars((string) ($rutina['cliente_nombres'] . ' ' . $rutina['cliente_apellidos']), ENT_QUOTES, 'UTF-8') ?></strong></p>
             </div>
-            <a class="boton boton-secundario" href="<?= url('rutina', 'ver', ['id' => $rutina['id_rutina']]) ?>">Ver detalle general</a>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'ver', 'id' => $rutina['id_rutina']]) ?>">Ver detalle general</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
@@ -806,6 +812,7 @@ $datos = $datos ?? [];
                             <th>Ejercicio</th>
                             <th>Series</th>
                             <th>Reps</th>
+                            <th>Peso</th>
                             <th>Descanso</th>
                             <th>Orden</th>
                             <th style="text-align: right;">Acciones</th>
@@ -814,17 +821,19 @@ $datos = $datos ?? [];
                     <tbody>
                         <?php foreach ($detalle as $fila): ?>
                             <tr>
-                                <td style="font-weight: 700; color: var(--color-primario);"><?= e($fila['dia_semana']) ?></td>
-                                <td style="font-weight: 600;"><?= e($fila['ejercicio_nombre']) ?></td>
-                                <td><?= e($fila['series']) ?></td>
-                                <td><?= e($fila['repeticiones']) ?></td>
-                                <td><?= e($fila['tiempo_descanso']) ?>s</td>
-                                <td>#<?= e($fila['orden']) ?></td>
+                                <td style="font-weight: 700; color: var(--color-primario);"><?= htmlspecialchars((string) $fila['dia_semana'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td style="font-weight: 600;"><a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'ver', 'id' => $fila['id_ejercicio']]) ?>"><?= htmlspecialchars((string) $fila['ejercicio_nombre'], ENT_QUOTES, 'UTF-8') ?></a></td>
+                                <td><?= htmlspecialchars((string) $fila['series'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars((string) $fila['repeticiones'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= $fila['peso'] !== null ? htmlspecialchars((string) $fila['peso'], ENT_QUOTES, 'UTF-8') . ' kg' : '—' ?></td>
+                                <td><?= htmlspecialchars((string) $fila['tiempo_descanso'], ENT_QUOTES, 'UTF-8') ?>s</td>
+                                <td>#<?= htmlspecialchars((string) $fila['orden'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="acciones" style="justify-content: flex-end;">
-                                        <form method="post" action="<?= url('rutina', 'quitarEjercicio') ?>" onsubmit="return confirm('¿Quitar este ejercicio de la rutina?');" style="margin: 0;">
-                                            <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
-                                            <input type="hidden" name="id_detalle" value="<?= e($fila['id_detalle']) ?>">
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'editarEjercicio', 'id_rutina' => $rutina['id_rutina'], 'id_detalle' => $fila['id_detalle']]) ?>">Editar</a>
+                                        <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'quitarEjercicio']) ?>" onsubmit="return confirm('¿Quitar este ejercicio de la rutina?');" style="margin: 0;">
+                                            <input type="hidden" name="id_rutina" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <input type="hidden" name="id_detalle" value="<?= htmlspecialchars((string) $fila['id_detalle'], ENT_QUOTES, 'UTF-8') ?>">
                                             <button type="submit" class="boton boton-pequeno boton-peligro">Quitar</button>
                                         </form>
                                     </div>
@@ -840,15 +849,15 @@ $datos = $datos ?? [];
             <h2 class="subseccion-titulo">
                 <span>+</span> Agregar nuevo ejercicio a la rutina
             </h2>
-            <form class="formulario formulario-full" method="post" action="<?= url('rutina', 'agregarEjercicio') ?>">
-                <input type="hidden" name="id_rutina" value="<?= e($rutina['id_rutina']) ?>">
+            <form class="formulario formulario-full" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'agregarEjercicio']) ?>">
+                <input type="hidden" name="id_rutina" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
                 <div class="fila-formulario">
                     <div class="campo" style="flex: 2;">
                         <label for="id_ejercicio">Ejercicio</label>
                         <select id="id_ejercicio" name="id_ejercicio" required>
                             <option value="">Selecciona un ejercicio</option>
                             <?php foreach ($ejercicios as $ejercicio): ?>
-                                <option value="<?= e($ejercicio['id_ejercicio']) ?>"><?= e($ejercicio['nombre']) ?></option>
+                                <option value="<?= htmlspecialchars((string) $ejercicio['id_ejercicio'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -856,7 +865,7 @@ $datos = $datos ?? [];
                         <label for="dia_semana">Día de la semana</label>
                         <select id="dia_semana" name="dia_semana" required>
                             <?php foreach ($dias as $dia): ?>
-                                <option value="<?= e($dia) ?>"><?= e($dia) ?></option>
+                                <option value="<?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -870,6 +879,10 @@ $datos = $datos ?? [];
                     <div class="campo">
                         <label for="repeticiones">Repeticiones</label>
                         <input type="number" id="repeticiones" name="repeticiones" min="1" placeholder="Ej: 10" required>
+                    </div>
+                    <div class="campo">
+                        <label for="peso">Peso (kg, opcional)</label>
+                        <input type="number" id="peso" name="peso" min="0" step="0.01" placeholder="Ej: 40">
                     </div>
                     <div class="campo">
                         <label for="tiempo_descanso">Descanso (seg)</label>
@@ -886,6 +899,73 @@ $datos = $datos ?? [];
                 </div>
             </form>
         </div>
+    </section>
+
+<?php elseif ($accion === 'editarEjercicio'): ?>
+
+    <section class="panel">
+        <div class="panel-cabecera">
+            <h1>Editar ejercicio de "<?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?>"</h1>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'asignar', 'id' => $rutina['id_rutina']]) ?>">← Volver</a>
+        </div>
+
+        <?php if (!empty($error)): ?>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <form class="formulario formulario-full" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'actualizarEjercicio']) ?>">
+            <input type="hidden" name="id_rutina" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="id_detalle" value="<?= htmlspecialchars((string) $detalle['id_detalle'], ENT_QUOTES, 'UTF-8') ?>">
+            <div class="fila-formulario">
+                <div class="campo" style="flex: 2;">
+                    <label for="id_ejercicio">Ejercicio</label>
+                    <select id="id_ejercicio" name="id_ejercicio" required>
+                        <option value="">Selecciona un ejercicio</option>
+                        <?php foreach ($ejercicios as $ejercicio): ?>
+                            <option value="<?= htmlspecialchars((string) $ejercicio['id_ejercicio'], ENT_QUOTES, 'UTF-8') ?>" <?= (int) $detalle['id_ejercicio'] === (int) $ejercicio['id_ejercicio'] ? 'selected' : '' ?>><?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="campo" style="flex: 1;">
+                    <label for="dia_semana">Día de la semana</label>
+                    <select id="dia_semana" name="dia_semana" required>
+                        <?php foreach ($dias as $dia): ?>
+                            <option value="<?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?>" <?= $detalle['dia_semana'] === $dia ? 'selected' : '' ?>><?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="series">Series</label>
+                    <input type="number" id="series" name="series" min="1" value="<?= htmlspecialchars((string) $detalle['series'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="repeticiones">Repeticiones</label>
+                    <input type="number" id="repeticiones" name="repeticiones" min="1" value="<?= htmlspecialchars((string) $detalle['repeticiones'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="peso">Peso (kg, opcional)</label>
+                    <input type="number" id="peso" name="peso" min="0" step="0.01" value="<?= htmlspecialchars((string) ($detalle['peso'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: 40">
+                </div>
+                <div class="campo">
+                    <label for="tiempo_descanso">Descanso (seg)</label>
+                    <input type="number" id="tiempo_descanso" name="tiempo_descanso" min="0" value="<?= htmlspecialchars((string) $detalle['tiempo_descanso'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="orden">Orden de ejecución</label>
+                    <input type="number" id="orden" name="orden" min="0" value="<?= htmlspecialchars((string) $detalle['orden'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+            </div>
+
+            <div style="margin-top: 8px;">
+                <button type="submit" class="boton">Guardar cambios</button>
+            </div>
+        </form>
     </section>
 
 <?php endif; ?>

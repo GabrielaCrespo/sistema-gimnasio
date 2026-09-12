@@ -32,20 +32,38 @@ class EvaluacionFisicaController
     {
         $this->requireRole(['instructor']);
 
-        if (!esPost()) {
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
             $this->redirect('evaluacionFisica', 'registrar');
             return;
         }
 
+        $idCliente = $_POST['id_cliente'] ?? $_GET['id_cliente'] ?? 0;
+        if (is_string($idCliente)) { $idCliente = trim($idCliente); }
+        $idCliente = (int) $idCliente;
+        $peso = $_POST['peso'] ?? $_GET['peso'] ?? '';
+        if (is_string($peso)) { $peso = trim($peso); }
+        $altura = $_POST['altura'] ?? $_GET['altura'] ?? '';
+        if (is_string($altura)) { $altura = trim($altura); }
+        $objetivo = $_POST['objetivo'] ?? $_GET['objetivo'] ?? '';
+        if (is_string($objetivo)) { $objetivo = trim($objetivo); }
+        $porcentajeGrasa = $_POST['porcentaje_grasa'] ?? $_GET['porcentaje_grasa'] ?? '';
+        if (is_string($porcentajeGrasa)) { $porcentajeGrasa = trim($porcentajeGrasa); }
+        $masaMuscular = $_POST['masa_muscular'] ?? $_GET['masa_muscular'] ?? '';
+        if (is_string($masaMuscular)) { $masaMuscular = trim($masaMuscular); }
+        $flexibilidad = $_POST['flexibilidad'] ?? $_GET['flexibilidad'] ?? '';
+        if (is_string($flexibilidad)) { $flexibilidad = trim($flexibilidad); }
+        $observaciones = $_POST['observaciones'] ?? $_GET['observaciones'] ?? '';
+        if (is_string($observaciones)) { $observaciones = trim($observaciones); }
+
         $datos = [
-            'id_cliente' => (int) input('id_cliente', 0),
-            'peso' => input('peso', ''),
-            'altura' => input('altura', ''),
-            'objetivo' => input('objetivo', '') ?: null,
-            'porcentaje_grasa' => input('porcentaje_grasa', ''),
-            'masa_muscular' => input('masa_muscular', ''),
-            'flexibilidad' => input('flexibilidad', ''),
-            'observaciones' => input('observaciones', '') ?: null,
+            'id_cliente' => $idCliente,
+            'peso' => $peso,
+            'altura' => $altura,
+            'objetivo' => $objetivo ?: null,
+            'porcentaje_grasa' => $porcentajeGrasa,
+            'masa_muscular' => $masaMuscular,
+            'flexibilidad' => $flexibilidad,
+            'observaciones' => $observaciones ?: null,
         ];
 
         $error = $this->validar($datos);
@@ -73,7 +91,7 @@ class EvaluacionFisicaController
 
         // La evaluación trae el peso/altura más recientes del cliente:
         // se reflejan también en CLIENTE, que es lo que se muestra en su perfil.
-        $this->clienteModelo->actualizar($datos['id_cliente'], (float) $datos['altura'], (float) $datos['peso']);
+        $this->clienteModelo->actualizarMedidas($datos['id_cliente'], (float) $datos['altura'], (float) $datos['peso']);
 
         $this->redirect('evaluacionFisica', 'historial', ['id' => $datos['id_cliente']]);
     }
@@ -100,7 +118,9 @@ class EvaluacionFisicaController
 
         // Rol instructor: si no se especificó cliente, se muestra el
         // selector en vez de una tabla vacía.
-        $idCliente = (int) input('id', 0);
+        $idCliente = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($idCliente)) { $idCliente = trim($idCliente); }
+        $idCliente = (int) $idCliente;
         $clientes = $this->clienteModelo->listarTodos();
 
         if ($idCliente === 0) {
@@ -176,7 +196,7 @@ class EvaluacionFisicaController
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */
     private function redirect(string $controlador, string $accion = 'index', array $parametros = []): void
     {
-        header('Location: ' . url($controlador, $accion, $parametros));
+        header('Location: ' . '/index.php?' . http_build_query(array_merge(['controller' => $controlador, 'action' => $accion], $parametros)));
         exit;
     }
 }

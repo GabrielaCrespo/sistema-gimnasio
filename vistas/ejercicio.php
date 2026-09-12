@@ -483,21 +483,29 @@ $datos = $datos ?? [];
         Gimnasio
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('login') ?>">Inicio</a>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-            <a href="<?= url('usuario') ?>">Usuarios</a>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>" class="activo">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">Clientes</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">Instructores</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>" class="activo">Ejercicios</a>
         <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>" class="activo">Ejercicios</a>
-            <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-            <a href="<?= url('rutina') ?>">Rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>" class="activo">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
+        <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('usuario', 'perfil') ?>">Mi perfil</a>
-        <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
+        <?php if ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php endif; ?>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
 <?php endif; ?>
@@ -509,7 +517,7 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Catálogo de Ejercicios</h1>
-            <a class="boton" href="<?= url('ejercicio', 'crear') ?>">
+            <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'crear']) ?>">
                 <span>+ Nuevo ejercicio</span>
             </a>
         </div>
@@ -517,7 +525,7 @@ $datos = $datos ?? [];
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
@@ -540,14 +548,14 @@ $datos = $datos ?? [];
                     <?php else: ?>
                         <?php foreach ($ejercicios as $ejercicio): ?>
                             <tr>
-                                <td style="font-weight: 600; color: var(--color-texto);"><?= e($ejercicio['nombre']) ?></td>
-                                <td style="color: var(--color-texto-suave);"><?= e($ejercicio['descripcion'] ?? '-') ?></td>
+                                <td style="font-weight: 600; color: var(--color-texto);"><?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) ($ejercicio['descripcion'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="acciones" style="justify-content: flex-end;">
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'ver', ['id' => $ejercicio['id_ejercicio']]) ?>">Ver</a>
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= url('ejercicio', 'editar', ['id' => $ejercicio['id_ejercicio']]) ?>">Editar</a>
-                                        <form method="post" action="<?= url('ejercicio', 'eliminar') ?>" onsubmit="return confirm('¿Eliminar este ejercicio?');" style="margin: 0;">
-                                            <input type="hidden" name="id" value="<?= e($ejercicio['id_ejercicio']) ?>">
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'ver', 'id' => $ejercicio['id_ejercicio']]) ?>">Ver</a>
+                                        <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'editar', 'id' => $ejercicio['id_ejercicio']]) ?>">Editar</a>
+                                        <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'eliminar']) ?>" onsubmit="return confirm('¿Eliminar este ejercicio?');" style="margin: 0;">
+                                            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $ejercicio['id_ejercicio'], ENT_QUOTES, 'UTF-8') ?>">
                                             <button type="submit" class="boton boton-pequeno boton-peligro">Eliminar</button>
                                         </form>
                                     </div>
@@ -564,32 +572,35 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1><?= e($ejercicio['nombre']) ?></h1>
-            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
+            <h1><?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?></h1>
+            <a class="boton boton-secundario" href="<?= $usuarioSesion['rol'] === 'cliente' ? '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) : '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <div class="detalle-bloque">
+            <?php if (!empty($ejercicio['url_video'])): ?>
+                <div class="detalle-item">
+                    <strong>Demostración en Video</strong>
+                    <video controls preload="metadata" style="max-width: 100%; border-radius: var(--radio-md); margin-top: 8px;">
+                        <source src="<?= htmlspecialchars((string) ('/videos/' . $ejercicio['url_video']), ENT_QUOTES, 'UTF-8') ?>">
+                        Tu navegador no soporta la reproducción de video.
+                    </video>
+                </div>
+            <?php endif; ?>
+
             <div class="detalle-item">
                 <strong>Descripción</strong>
-                <p><?= nl2br(e($ejercicio['descripcion'] ?? 'Sin descripción')) ?></p>
+                <p><?= nl2br(htmlspecialchars((string) ($ejercicio['descripcion'] ?? 'Sin descripción'), ENT_QUOTES, 'UTF-8')) ?></p>
             </div>
 
             <div class="detalle-item">
                 <strong>Beneficio</strong>
-                <p><?= nl2br(e($ejercicio['beneficio'] ?? 'No especificado')) ?></p>
+                <p><?= nl2br(htmlspecialchars((string) ($ejercicio['beneficio'] ?? 'No especificado'), ENT_QUOTES, 'UTF-8')) ?></p>
             </div>
 
             <div class="detalle-item">
                 <strong>Indicaciones Técnicas</strong>
-                <p><?= nl2br(e($ejercicio['indicaciones'] ?? 'No especificadas')) ?></p>
+                <p><?= nl2br(htmlspecialchars((string) ($ejercicio['indicaciones'] ?? 'No especificadas'), ENT_QUOTES, 'UTF-8')) ?></p>
             </div>
-
-            <?php if (!empty($ejercicio['url_video'])): ?>
-                <div class="detalle-item">
-                    <strong>Demostración en Video</strong>
-                    <p><a href="<?= e($ejercicio['url_video']) ?>" target="_blank" rel="noopener" style="font-weight: 600;">Ver enlace externo de video ↗</a></p>
-                </div>
-            <?php endif; ?>
 
             <div class="detalle-item">
                 <strong>Grupos Musculares Asociados</strong>
@@ -598,7 +609,7 @@ $datos = $datos ?? [];
                 <?php else: ?>
                     <div class="chips-contenedor">
                         <?php foreach ($grupos as $grupo): ?>
-                            <span class="chip-grupo"><?= e($grupo['nombre']) ?></span>
+                            <span class="chip-grupo"><?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?></span>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
@@ -611,45 +622,45 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Nuevo Ejercicio</h1>
-            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario formulario-ancho" method="post" action="<?= url('ejercicio', 'guardar') ?>">
+        <form class="formulario formulario-ancho" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'guardar']) ?>" enctype="multipart/form-data">
             <div class="campo">
                 <label for="nombre">Nombre del ejercicio</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($datos['nombre'] ?? '') ?>" placeholder="Ej: Press de banca plano" required>
+                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) ($datos['nombre'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Press de banca plano" required>
             </div>
             <div class="campo">
                 <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Breve descripción del movimiento..."><?= e($datos['descripcion'] ?? '') ?></textarea>
+                <textarea id="descripcion" name="descripcion" rows="3" placeholder="Breve descripción del movimiento..."><?= htmlspecialchars((string) ($datos['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
                 <label for="beneficio">Beneficio</label>
-                <textarea id="beneficio" name="beneficio" rows="3" placeholder="¿Qué aporta al atleta?"><?= e($datos['beneficio'] ?? '') ?></textarea>
+                <textarea id="beneficio" name="beneficio" rows="3" placeholder="¿Qué aporta al atleta?"><?= htmlspecialchars((string) ($datos['beneficio'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
                 <label for="indicaciones">Indicaciones posturales y ejecución</label>
-                <textarea id="indicaciones" name="indicaciones" rows="3" placeholder="Espalda apoyada, retracción escapular..."><?= e($datos['indicaciones'] ?? '') ?></textarea>
+                <textarea id="indicaciones" name="indicaciones" rows="3" placeholder="Espalda apoyada, retracción escapular..."><?= htmlspecialchars((string) ($datos['indicaciones'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
-                <label for="url_video">URL de video demostrativo (opcional)</label>
-                <input type="url" id="url_video" name="url_video" value="<?= e($datos['url_video'] ?? '') ?>" placeholder="https://youtube.com/...">
+                <label for="video">Video demostrativo (opcional)</label>
+                <input type="file" id="video" name="video" accept="video/mp4,video/webm,video/ogg,.mov">
             </div>
             <div class="campo">
                 <label>Grupos musculares involucrados</label>
                 <div class="selector-grupos">
                     <?php foreach ($gruposDisponibles as $grupo): ?>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
+                            <input type="checkbox" name="grupos[]" value="<?= htmlspecialchars((string) $grupo['id_grupo_muscular'], ENT_QUOTES, 'UTF-8') ?>"
                                 <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados ?? [], true) ? 'checked' : '' ?>>
-                            <span><?= e($grupo['nombre']) ?></span>
+                            <span><?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?></span>
                         </label>
                     <?php endforeach; ?>
                 </div>
@@ -665,46 +676,52 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Editar Ejercicio</h1>
-            <a class="boton boton-secundario" href="<?= url('ejercicio', 'index') ?>">← Volver</a>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario formulario-ancho" method="post" action="<?= url('ejercicio', 'actualizar') ?>">
-            <input type="hidden" name="id" value="<?= e($ejercicio['id_ejercicio']) ?>">
+        <form class="formulario formulario-ancho" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'actualizar']) ?>" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $ejercicio['id_ejercicio'], ENT_QUOTES, 'UTF-8') ?>">
             <div class="campo">
                 <label for="nombre">Nombre del ejercicio</label>
-                <input type="text" id="nombre" name="nombre" value="<?= e($ejercicio['nombre']) ?>" required>
+                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
             <div class="campo">
                 <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3"><?= e($ejercicio['descripcion'] ?? '') ?></textarea>
+                <textarea id="descripcion" name="descripcion" rows="3"><?= htmlspecialchars((string) ($ejercicio['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
                 <label for="beneficio">Beneficio</label>
-                <textarea id="beneficio" name="beneficio" rows="3"><?= e($ejercicio['beneficio'] ?? '') ?></textarea>
+                <textarea id="beneficio" name="beneficio" rows="3"><?= htmlspecialchars((string) ($ejercicio['beneficio'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
                 <label for="indicaciones">Indicaciones posturales y ejecución</label>
-                <textarea id="indicaciones" name="indicaciones" rows="3"><?= e($ejercicio['indicaciones'] ?? '') ?></textarea>
+                <textarea id="indicaciones" name="indicaciones" rows="3"><?= htmlspecialchars((string) ($ejercicio['indicaciones'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
             <div class="campo">
-                <label for="url_video">URL de video (opcional)</label>
-                <input type="url" id="url_video" name="url_video" value="<?= e($ejercicio['url_video'] ?? '') ?>">
+                <?php if (!empty($ejercicio['url_video'])): ?>
+                    <label>Video actual</label>
+                    <video controls preload="metadata" style="max-width: 100%; border-radius: var(--radio-md); margin-bottom: 10px;">
+                        <source src="<?= htmlspecialchars((string) ('/videos/' . $ejercicio['url_video']), ENT_QUOTES, 'UTF-8') ?>">
+                    </video>
+                <?php endif; ?>
+                <label for="video"><?= !empty($ejercicio['url_video']) ? 'Reemplazar video (opcional)' : 'Video demostrativo (opcional)' ?></label>
+                <input type="file" id="video" name="video" accept="video/mp4,video/webm,video/ogg,.mov">
             </div>
             <div class="campo">
                 <label>Grupos musculares involucrados</label>
                 <div class="selector-grupos">
                     <?php foreach ($gruposDisponibles as $grupo): ?>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="grupos[]" value="<?= e($grupo['id_grupo_muscular']) ?>"
+                            <input type="checkbox" name="grupos[]" value="<?= htmlspecialchars((string) $grupo['id_grupo_muscular'], ENT_QUOTES, 'UTF-8') ?>"
                                 <?= in_array((int) $grupo['id_grupo_muscular'], $gruposSeleccionados ?? [], true) ? 'checked' : '' ?>>
-                            <span><?= e($grupo['nombre']) ?></span>
+                            <span><?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?></span>
                         </label>
                     <?php endforeach; ?>
                 </div>

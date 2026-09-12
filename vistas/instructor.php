@@ -1,6 +1,6 @@
 <?php
 /**
- * Vista de usuarios (UsuarioController). $accion decide el contenido:
+ * Vista de instructores (InstructorController). $accion decide el contenido:
  * listar, crear, editar o perfil.
  */
 $usuarioSesion = $_SESSION['user'] ?? null;
@@ -11,7 +11,7 @@ $datos = $datos ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios - Gimnasio</title>
+    <title>Gestión de Instructores - Gimnasio</title>
     <!-- Tipografía profesional -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,17 +24,17 @@ $datos = $datos ?? [];
             --color-primario-suave: #fdf2f6;
             --color-primario-borde: #fcc2d7;
             --color-acento: #ff6b8b;
-            
+
             /* Fondos y Neutros Claros */
             --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
             --color-borde-suave: #f1e4e8;
-            
+
             /* Textos */
             --color-texto: #2d242a;
             --color-texto-suave: #796670;
             --color-texto-mutado: #a89aa1;
-            
+
             /* Estados */
             --color-peligro: #ef4444;
             --color-peligro-claro: #fef2f2;
@@ -249,7 +249,7 @@ $datos = $datos ?? [];
             border-radius: var(--radio-sm);
         }
 
-        /* Insignias de Rol y Estado */
+        /* Insignias de Estado */
         .insignia {
             display: inline-flex;
             align-items: center;
@@ -357,10 +357,6 @@ $datos = $datos ?? [];
             gap: 7px;
         }
 
-        .campo[hidden] {
-            display: none;
-        }
-
         .campo label {
             font-weight: 600;
             font-size: 0.88rem;
@@ -370,9 +366,7 @@ $datos = $datos ?? [];
         .campo input[type="text"],
         .campo input[type="email"],
         .campo input[type="password"],
-        .campo input[type="date"],
-        .campo input[type="number"],
-        .campo select {
+        .campo input[type="date"] {
             padding: 11px 14px;
             border: 1px solid var(--color-borde-suave);
             border-radius: var(--radio-md);
@@ -383,18 +377,10 @@ $datos = $datos ?? [];
             transition: var(--transicion);
         }
 
-        .campo input:focus,
-        .campo select:focus {
+        .campo input:focus {
             outline: none;
             border-color: var(--color-primario);
             box-shadow: 0 0 0 4px var(--color-primario-suave);
-        }
-
-        .campo input:disabled {
-            background: #f8fafc;
-            color: var(--color-texto-suave);
-            border-color: var(--color-borde-suave);
-            cursor: not-allowed;
         }
 
         .fila-formulario {
@@ -453,7 +439,6 @@ $datos = $datos ?? [];
 </head>
 <body>
 
-<?php if ($usuarioSesion): ?>
 <nav class="nav">
     <div class="nav-marca">
         <span class="nav-marca-icono">
@@ -462,27 +447,26 @@ $datos = $datos ?? [];
         Gimnasio
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('login') ?>">Inicio</a>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-            <a href="<?= url('usuario') ?>" class="<?= $accion === 'listar' || $accion === 'crear' || $accion === 'editar' ? 'activo' : '' ?>">Usuarios</a>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">Clientes</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>" class="<?= in_array($accion, ['listar', 'crear', 'editar'], true) ? 'activo' : '' ?>">Instructores</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
         <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= url('grupoMuscular') ?>">Grupos musculares</a>
-            <a href="<?= url('ejercicio') ?>">Ejercicios</a>
-            <a href="<?= url('evaluacionFisica', 'registrar') ?>">Registrar evaluación</a>
-            <a href="<?= url('rutina') ?>">Rutinas</a>
-        <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-            <a href="<?= url('rutina') ?>">Mis rutinas</a>
-            <a href="<?= url('evaluacionFisica', 'historial') ?>">Mis evaluaciones</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
-        <a href="<?= url('usuario', 'perfil') ?>" class="<?= $accion === 'perfil' ? 'activo' : '' ?>">Mi perfil</a>
-        <a href="<?= url('login', 'logout') ?>" class="nav-salir">Cerrar sesión</a>
+        <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>" class="<?= $accion === 'perfil' ? 'activo' : '' ?>">Mi perfil</a>
+        <?php endif; ?>
+        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
-<?php endif; ?>
 
 <main class="contenedor">
 
@@ -490,9 +474,9 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Gestión de Usuarios</h1>
-            <a class="boton" href="<?= url('usuario', 'crear') ?>">
-                <span>+ Crear usuario</span>
+            <h1>Gestión de Instructores</h1>
+            <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'crear']) ?>">
+                <span>+ Crear instructor</span>
             </a>
         </div>
 
@@ -503,20 +487,20 @@ $datos = $datos ?? [];
                         <th>C.I.</th>
                         <th>Nombre completo</th>
                         <th>Correo electrónico</th>
-                        <th>Rol</th>
+                        <th>Especialidad</th>
                         <th>Estado</th>
                         <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($usuarios as $usuario): ?>
+                    <?php foreach ($instructores as $instructor): ?>
                         <tr>
-                            <td style="font-weight: 600; color: var(--color-texto);"><?= e($usuario['ci']) ?></td>
-                            <td><?= e($usuario['nombres'] . ' ' . $usuario['apellidos']) ?></td>
-                            <td style="color: var(--color-texto-suave);"><?= e($usuario['correo']) ?></td>
-                            <td><span class="insignia insignia-rol"><?= e(ucfirst($usuario['rol'])) ?></span></td>
+                            <td style="font-weight: 600; color: var(--color-texto);"><?= htmlspecialchars((string) $instructor['ci'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= htmlspecialchars((string) ($instructor['nombres'] . ' ' . $instructor['apellidos']), ENT_QUOTES, 'UTF-8') ?></td>
+                            <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) $instructor['correo'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= htmlspecialchars((string) $instructor['especialidad'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td>
-                                <?php if ($usuario['estado']): ?>
+                                <?php if ($instructor['estado']): ?>
                                     <span class="insignia insignia-activo">Activo</span>
                                 <?php else: ?>
                                     <span class="insignia insignia-inactivo">Inactivo</span>
@@ -524,16 +508,14 @@ $datos = $datos ?? [];
                             </td>
                             <td>
                                 <div class="acciones" style="justify-content: flex-end;">
-                                    <a class="boton boton-pequeno boton-secundario" href="<?= url('usuario', 'editar', ['id' => $usuario['id_usuario']]) ?>">Editar</a>
-                                    <?php if ((int) $usuario['id_usuario'] !== (int) ($_SESSION['user']['id'] ?? 0)): ?>
-                                        <form method="post" action="<?= url('usuario', 'cambiarEstado') ?>" style="margin: 0;">
-                                            <input type="hidden" name="id" value="<?= e($usuario['id_usuario']) ?>">
-                                            <input type="hidden" name="estado" value="<?= $usuario['estado'] ? '0' : '1' ?>">
-                                            <button type="submit" class="boton boton-pequeno <?= $usuario['estado'] ? 'boton-peligro' : '' ?>">
-                                                <?= $usuario['estado'] ? 'Desactivar' : 'Activar' ?>
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
+                                    <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'editar', 'id' => $instructor['id_instructor']]) ?>">Editar</a>
+                                    <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'cambiarEstado']) ?>" style="margin: 0;">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars((string) $instructor['id_instructor'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="hidden" name="estado" value="<?= $instructor['estado'] ? '0' : '1' ?>">
+                                        <button type="submit" class="boton boton-pequeno <?= $instructor['estado'] ? 'boton-peligro' : '' ?>">
+                                            <?= $instructor['estado'] ? 'Desactivar' : 'Activar' ?>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -547,43 +529,43 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Crear Nuevo Usuario</h1>
-            <a class="boton boton-secundario" href="<?= url('usuario', 'index') ?>">← Volver</a>
+            <h1>Crear Nuevo Instructor</h1>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('usuario', 'guardar') ?>">
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'guardar']) ?>">
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="nombres">Nombres</label>
-                    <input type="text" id="nombres" name="nombres" value="<?= e($datos['nombres'] ?? '') ?>" placeholder="Ej: Valentina" required>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) ($datos['nombres'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Valentina" required>
                 </div>
                 <div class="campo">
                     <label for="apellidos">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="<?= e($datos['apellidos'] ?? '') ?>" placeholder="Ej: Gómez Rojas" required>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) ($datos['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Gómez Rojas" required>
                 </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="ci">Cédula de identidad</label>
-                    <input type="text" id="ci" name="ci" value="<?= e($datos['ci'] ?? '') ?>" placeholder="Número de documento" required>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) ($datos['ci'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Número de documento" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= e($datos['fecha_nacimiento'] ?? '') ?>" required>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) ($datos['fecha_nacimiento'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" value="<?= e($datos['correo'] ?? '') ?>" placeholder="nombre@ejemplo.com" required>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) ($datos['correo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="nombre@ejemplo.com" required>
             </div>
 
             <div class="campo">
@@ -592,22 +574,12 @@ $datos = $datos ?? [];
             </div>
 
             <div class="campo">
-                <label for="rol">Rol del usuario</label>
-                <select id="rol" name="rol" required>
-                    <option value="">Selecciona un rol</option>
-                    <option value="administrador" <?= ($datos['rol'] ?? '') === 'administrador' ? 'selected' : '' ?>>Administrador</option>
-                    <option value="instructor" <?= ($datos['rol'] ?? '') === 'instructor' ? 'selected' : '' ?>>Instructor</option>
-                    <option value="cliente" <?= ($datos['rol'] ?? '') === 'cliente' ? 'selected' : '' ?>>Cliente</option>
-                </select>
-            </div>
-
-            <div class="campo" id="campo-especialidad" <?= ($datos['rol'] ?? '') === 'instructor' ? '' : 'hidden' ?>>
-                <label for="especialidad">Especialidad técnica (Instructor)</label>
-                <input type="text" id="especialidad" name="especialidad" value="<?= e($datos['especialidad'] ?? '') ?>" placeholder="Ej: Musculación, Crossfit, Funcional...">
+                <label for="especialidad">Especialidad técnica</label>
+                <input type="text" id="especialidad" name="especialidad" value="<?= htmlspecialchars((string) ($datos['especialidad'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Musculación, Crossfit, Funcional..." required>
             </div>
 
             <div style="margin-top: 8px;">
-                <button type="submit" class="boton">Guardar usuario</button>
+                <button type="submit" class="boton">Guardar instructor</button>
             </div>
         </form>
     </section>
@@ -616,58 +588,51 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Editar Usuario</h1>
-            <a class="boton boton-secundario" href="<?= url('usuario', 'index') ?>">← Volver</a>
+            <h1>Editar Instructor</h1>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('usuario', 'actualizar') ?>">
-            <input type="hidden" name="id" value="<?= e($usuario['id_usuario']) ?>">
-
-            <div class="campo">
-                <label>Rol de cuenta</label>
-                <input type="text" value="<?= e(ucfirst($usuario['rol'])) ?>" disabled>
-            </div>
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'actualizar']) ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $instructor['id_instructor'], ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="nombres">Nombres</label>
-                    <input type="text" id="nombres" name="nombres" value="<?= e($usuario['nombres']) ?>" required>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) $instructor['nombres'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="apellidos">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="<?= e($usuario['apellidos']) ?>" required>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) $instructor['apellidos'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="ci">Cédula de identidad</label>
-                    <input type="text" id="ci" name="ci" value="<?= e($usuario['ci']) ?>" required>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) $instructor['ci'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= e($usuario['fecha_nacimiento']) ?>" required>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) $instructor['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" value="<?= e($usuario['correo']) ?>" required>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) $instructor['correo'], ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
-            <?php if ($usuario['rol'] === 'instructor'): ?>
-                <div class="campo">
-                    <label for="especialidad">Especialidad</label>
-                    <input type="text" id="especialidad" name="especialidad" value="<?= e($especialidad) ?>" required>
-                </div>
-            <?php endif; ?>
+            <div class="campo">
+                <label for="especialidad">Especialidad</label>
+                <input type="text" id="especialidad" name="especialidad" value="<?= htmlspecialchars((string) $instructor['especialidad'], ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
 
             <div style="margin-top: 8px;">
                 <button type="submit" class="boton">Guardar cambios</button>
@@ -680,74 +645,55 @@ $datos = $datos ?? [];
     <section class="panel">
         <div class="panel-cabecera">
             <h1>Mi Perfil</h1>
-            <span class="insignia insignia-rol">Cuenta: <?= e(ucfirst($usuario['rol'])) ?></span>
+            <span class="insignia insignia-rol">Cuenta: Instructor</span>
         </div>
 
         <?php if (!empty($error)): ?>
             <div class="alerta alerta-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= e($error) ?>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($exito)): ?>
             <div class="alerta alerta-exito">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                <?= e($exito) ?>
+                <?= htmlspecialchars((string) $exito, ENT_QUOTES, 'UTF-8') ?>
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= url('usuario', 'actualizarPerfil') ?>">
-            <div class="campo">
-                <label>Rol asignado</label>
-                <input type="text" value="<?= e(ucfirst($usuario['rol'])) ?>" disabled>
-            </div>
-
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'actualizarPerfil']) ?>">
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="nombres">Nombres</label>
-                    <input type="text" id="nombres" name="nombres" value="<?= e($usuario['nombres']) ?>" required>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) $instructor['nombres'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="apellidos">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="<?= e($usuario['apellidos']) ?>" required>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) $instructor['apellidos'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
                     <label for="ci">Cédula de identidad</label>
-                    <input type="text" id="ci" name="ci" value="<?= e($usuario['ci']) ?>" required>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) $instructor['ci'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= e($usuario['fecha_nacimiento']) ?>" required>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) $instructor['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
             </div>
 
             <div class="campo">
                 <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" value="<?= e($usuario['correo']) ?>" required>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) $instructor['correo'], ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
-            <?php if ($usuario['rol'] === 'cliente'): ?>
-                <div class="fila-formulario">
-                    <div class="campo">
-                        <label for="altura">Estatura / Altura (m)</label>
-                        <input type="number" step="0.01" id="altura" name="altura" value="<?= e($clienteInfo['altura'] ?? '') ?>" placeholder="Ej: 1.75">
-                    </div>
-                    <div class="campo">
-                        <label for="peso">Peso actual (kg)</label>
-                        <input type="number" step="0.01" id="peso" name="peso" value="<?= e($clienteInfo['peso'] ?? '') ?>" placeholder="Ej: 70.50">
-                    </div>
-                </div>
-
-            <?php elseif ($usuario['rol'] === 'instructor'): ?>
-                <div class="campo">
-                    <label for="especialidad">Especialidad deportiva</label>
-                    <input type="text" id="especialidad" name="especialidad" value="<?= e($instructorInfo['especialidad'] ?? '') ?>" required>
-                </div>
-            <?php endif; ?>
+            <div class="campo">
+                <label for="especialidad">Especialidad deportiva</label>
+                <input type="text" id="especialidad" name="especialidad" value="<?= htmlspecialchars((string) $instructor['especialidad'], ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
 
             <div style="margin-top: 8px;">
                 <button type="submit" class="boton">Guardar cambios</button>
@@ -762,16 +708,5 @@ $datos = $datos ?? [];
 <footer class="pie">
     <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
-
-<script>
-    // Control dinámico del campo de especialidad para rol instructor
-    var selectRol = document.getElementById('rol');
-    var campoEspecialidad = document.getElementById('campo-especialidad');
-    if (selectRol && campoEspecialidad) {
-        selectRol.addEventListener('change', function () {
-            campoEspecialidad.hidden = this.value !== 'instructor';
-        });
-    }
-</script>
 </body>
 </html>

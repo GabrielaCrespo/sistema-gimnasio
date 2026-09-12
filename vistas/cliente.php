@@ -1,17 +1,16 @@
 <?php
 /**
- * Vista de grupos musculares (GrupoMuscularController). $accion decide el
- * contenido: listar, crear o editar.
+ * Vista de clientes (ClienteController). $accion decide el contenido:
+ * listar, editar o perfil.
  */
 $usuarioSesion = $_SESSION['user'] ?? null;
-$datos = $datos ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grupos Musculares - Sistema de Gimnasio</title>
+    <title>Gestión de Clientes - Gimnasio</title>
     <!-- Tipografía profesional -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,23 +23,24 @@ $datos = $datos ?? [];
             --color-primario-suave: #fdf2f6;
             --color-primario-borde: #fcc2d7;
             --color-acento: #ff6b8b;
-            
+
             /* Fondos y Neutros Claros */
             --color-fondo: #faf7f8;
             --color-superficie: #ffffff;
             --color-borde-suave: #f1e4e8;
-            
+
             /* Textos */
             --color-texto: #2d242a;
             --color-texto-suave: #796670;
             --color-texto-mutado: #a89aa1;
-            
+
             /* Estados */
             --color-peligro: #ef4444;
             --color-peligro-claro: #fef2f2;
             --color-peligro-borde: #fecaca;
             --color-exito: #10b981;
             --color-exito-claro: #ecfdf5;
+            --color-exito-borde: #a7f3d0;
 
             /* Radios y Sombras */
             --radio-lg: 20px;
@@ -178,7 +178,7 @@ $datos = $datos ?? [];
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 26px;
+            margin-bottom: 24px;
             padding-bottom: 18px;
             border-bottom: 1px solid var(--color-borde-suave);
         }
@@ -248,6 +248,45 @@ $datos = $datos ?? [];
             border-radius: var(--radio-sm);
         }
 
+        /* Insignias de Estado */
+        .insignia {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .insignia::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .insignia-activo {
+            background: var(--color-exito-claro);
+            color: var(--color-exito);
+            border: 1px solid var(--color-exito-borde);
+        }
+
+        .insignia-inactivo {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+        .insignia-rol {
+            background: var(--color-primario-suave);
+            color: var(--color-primario-hover);
+            border: 1px solid var(--color-primario-borde);
+        }
+
         /* Tablas */
         .tabla-envoltura {
             overflow-x: auto;
@@ -255,6 +294,7 @@ $datos = $datos ?? [];
             border-radius: var(--radio-md);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             background: #ffffff;
+            margin-top: 14px;
         }
 
         table {
@@ -306,14 +346,14 @@ $datos = $datos ?? [];
             display: flex;
             flex-direction: column;
             gap: 20px;
-            margin-top: 18px;
-            max-width: 620px;
+            margin-top: 16px;
+            max-width: 680px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 7px;
         }
 
         .campo label {
@@ -323,8 +363,10 @@ $datos = $datos ?? [];
         }
 
         .campo input[type="text"],
-        .campo textarea {
-            padding: 12px 14px;
+        .campo input[type="email"],
+        .campo input[type="date"],
+        .campo input[type="number"] {
+            padding: 11px 14px;
             border: 1px solid var(--color-borde-suave);
             border-radius: var(--radio-md);
             font-size: 0.94rem;
@@ -334,15 +376,23 @@ $datos = $datos ?? [];
             transition: var(--transicion);
         }
 
-        .campo input:focus,
-        .campo textarea:focus {
+        .campo input:focus {
             outline: none;
             border-color: var(--color-primario);
             box-shadow: 0 0 0 4px var(--color-primario-suave);
         }
 
-        .campo textarea {
-            resize: vertical;
+        .campo input:disabled {
+            background: #f8fafc;
+            color: var(--color-texto-suave);
+            border-color: var(--color-borde-suave);
+            cursor: not-allowed;
+        }
+
+        .fila-formulario {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
         }
 
         /* Alertas */
@@ -363,6 +413,12 @@ $datos = $datos ?? [];
             border: 1px solid var(--color-peligro-borde);
         }
 
+        .alerta-exito {
+            background: var(--color-exito-claro);
+            color: var(--color-exito);
+            border: 1px solid var(--color-exito-borde);
+        }
+
         /* Pie de página */
         .pie {
             margin-top: auto;
@@ -381,12 +437,14 @@ $datos = $datos ?? [];
             .panel {
                 padding: 24px 20px;
             }
+            .fila-formulario {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
-<?php if ($usuarioSesion): ?>
 <nav class="nav">
     <div class="nav-marca">
         <span class="nav-marca-icono">
@@ -397,25 +455,22 @@ $datos = $datos ?? [];
     <div class="nav-enlaces">
         <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>">Inicio</a>
         <?php if ($usuarioSesion['rol'] === 'administrador'): ?>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">Clientes</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>" class="<?= $accion === 'listar' || $accion === 'editar' ? 'activo' : '' ?>">Clientes</a>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'index']) ?>">Instructores</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>" class="activo">Grupos musculares</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
-        <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>" class="activo">Grupos musculares</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
+        <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
-        <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'instructor', 'action' => 'perfil']) ?>">Mi perfil</a>
+        <?php if ($usuarioSesion['rol'] === 'cliente'): ?>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'perfil']) ?>" class="<?= $accion === 'perfil' ? 'activo' : '' ?>">Mi perfil</a>
         <?php endif; ?>
         <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
-<?php endif; ?>
 
 <main class="contenedor">
 
@@ -423,86 +478,58 @@ $datos = $datos ?? [];
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Grupos Musculares</h1>
-            <a class="boton" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'crear']) ?>">
-                <span>+ Nuevo grupo muscular</span>
-            </a>
+            <h1>Gestión de Clientes</h1>
         </div>
 
         <div class="tabla-envoltura">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 250px;">Nombre</th>
-                        <th>Descripción</th>
-                        <th style="width: 180px; text-align: right;">Acciones</th>
+                        <th>C.I.</th>
+                        <th>Nombre completo</th>
+                        <th>Correo electrónico</th>
+                        <th>Estado</th>
+                        <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (empty($grupos)): ?>
+                    <?php foreach ($clientes as $cliente): ?>
                         <tr>
-                            <td colspan="3" style="text-align: center; color: var(--color-texto-suave); padding: 30px;">
-                                No hay grupos musculares registrados.
+                            <td style="font-weight: 600; color: var(--color-texto);"><?= htmlspecialchars((string) $cliente['ci'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?></td>
+                            <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) $cliente['correo'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td>
+                                <?php if ($cliente['estado']): ?>
+                                    <span class="insignia insignia-activo">Activo</span>
+                                <?php else: ?>
+                                    <span class="insignia insignia-inactivo">Inactivo</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="acciones" style="justify-content: flex-end;">
+                                    <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'editar', 'id' => $cliente['id_cliente']]) ?>">Editar</a>
+                                    <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'cambiarEstado']) ?>" style="margin: 0;">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars((string) $cliente['id_cliente'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="hidden" name="estado" value="<?= $cliente['estado'] ? '0' : '1' ?>">
+                                        <button type="submit" class="boton boton-pequeno <?= $cliente['estado'] ? 'boton-peligro' : '' ?>">
+                                            <?= $cliente['estado'] ? 'Desactivar' : 'Activar' ?>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
-                    <?php else: ?>
-                        <?php foreach ($grupos as $grupo): ?>
-                            <tr>
-                                <td style="font-weight: 600; color: var(--color-texto);"><?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
-                                <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) ($grupo['descripcion'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
-                                <td>
-                                    <div class="acciones" style="justify-content: flex-end;">
-                                        <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'editar', 'id' => $grupo['id_grupo_muscular']]) ?>">Editar</a>
-                                        <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'eliminar']) ?>" onsubmit="return confirm('¿Eliminar este grupo muscular? También se quitará de los ejercicios asociados.');" style="margin: 0;">
-                                            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $grupo['id_grupo_muscular'], ENT_QUOTES, 'UTF-8') ?>">
-                                            <button type="submit" class="boton boton-pequeno boton-peligro">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-    </section>
-
-<?php elseif ($accion === 'crear'): ?>
-
-    <section class="panel">
-        <div class="panel-cabecera">
-            <h1>Nuevo Grupo Muscular</h1>
-            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">← Volver</a>
-        </div>
-
-        <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'guardar']) ?>">
-            <div class="campo">
-                <label for="nombre">Nombre del grupo muscular</label>
-                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) ($datos['nombre'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Pectorales, Cuádriceps, Deltoides..." required>
-            </div>
-            <div class="campo">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4" placeholder="Breve detalle anatómico o funcional..."><?= htmlspecialchars((string) ($datos['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
-            </div>
-            <div style="margin-top: 8px;">
-                <button type="submit" class="boton">Guardar grupo muscular</button>
-            </div>
-        </form>
     </section>
 
 <?php elseif ($accion === 'editar'): ?>
 
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Editar Grupo Muscular</h1>
-            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">← Volver</a>
+            <h1>Editar Cliente</h1>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'index']) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
@@ -512,16 +539,103 @@ $datos = $datos ?? [];
             </div>
         <?php endif; ?>
 
-        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'actualizar']) ?>">
-            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $grupo['id_grupo_muscular'], ENT_QUOTES, 'UTF-8') ?>">
-            <div class="campo">
-                <label for="nombre">Nombre del grupo muscular</label>
-                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'actualizar']) ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $cliente['id_cliente'], ENT_QUOTES, 'UTF-8') ?>">
+
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="nombres">Nombres</label>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) $cliente['nombres'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) $cliente['apellidos'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
             </div>
-            <div class="campo">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4"><?= htmlspecialchars((string) ($grupo['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="ci">Cédula de identidad</label>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) $cliente['ci'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) $cliente['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
             </div>
+
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) $cliente['correo'], ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
+
+            <div style="margin-top: 8px;">
+                <button type="submit" class="boton">Guardar cambios</button>
+            </div>
+        </form>
+    </section>
+
+<?php elseif ($accion === 'perfil'): ?>
+
+    <section class="panel">
+        <div class="panel-cabecera">
+            <h1>Mi Perfil</h1>
+            <span class="insignia insignia-rol">Cuenta: Cliente</span>
+        </div>
+
+        <?php if (!empty($error)): ?>
+            <div class="alerta alerta-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($exito)): ?>
+            <div class="alerta alerta-exito">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                <?= htmlspecialchars((string) $exito, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'actualizarPerfil']) ?>">
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="nombres">Nombres</label>
+                    <input type="text" id="nombres" name="nombres" value="<?= htmlspecialchars((string) $cliente['nombres'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" id="apellidos" name="apellidos" value="<?= htmlspecialchars((string) $cliente['apellidos'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+            </div>
+
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="ci">Cédula de identidad</label>
+                    <input type="text" id="ci" name="ci" value="<?= htmlspecialchars((string) $cliente['ci'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="campo">
+                    <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?= htmlspecialchars((string) $cliente['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" value="<?= htmlspecialchars((string) $cliente['correo'], ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
+
+            <div class="fila-formulario">
+                <div class="campo">
+                    <label for="altura">Estatura / Altura (m)</label>
+                    <input type="number" step="0.01" id="altura" name="altura" value="<?= htmlspecialchars((string) ($cliente['altura'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: 1.75">
+                </div>
+                <div class="campo">
+                    <label for="peso">Peso actual (kg)</label>
+                    <input type="number" step="0.01" id="peso" name="peso" value="<?= htmlspecialchars((string) ($cliente['peso'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: 70.50">
+                </div>
+            </div>
+
             <div style="margin-top: 8px;">
                 <button type="submit" class="boton">Guardar cambios</button>
             </div>
@@ -535,6 +649,5 @@ $datos = $datos ?? [];
 <footer class="pie">
     <p>&copy; <?= date('Y') ?> Sistema de Gestión de Gimnasio. Todos los derechos reservados.</p>
 </footer>
-
 </body>
 </html>
