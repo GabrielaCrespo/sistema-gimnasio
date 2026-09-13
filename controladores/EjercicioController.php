@@ -8,24 +8,6 @@
  */
 class EjercicioController
 {
-    /** Extensiones de video local aceptadas al subir el archivo de un ejercicio. */
-    private const EXTENSIONES_VIDEO_PERMITIDAS = ['mp4', 'webm', 'ogg', 'mov'];
-
-    /** Tamaño máximo aceptado para el archivo de video (100 MB). */
-    private const TAMANO_MAXIMO_VIDEO = 100 * 1024 * 1024;
-
-    /** Extensiones de imagen aceptadas al subir la imagen de un ejercicio. */
-    private const EXTENSIONES_IMAGEN_PERMITIDAS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-
-    /** Tamaño máximo aceptado para el archivo de imagen (10 MB). */
-    private const TAMANO_MAXIMO_IMAGEN = 10 * 1024 * 1024;
-
-    /** Carpeta local (fuera del control de versiones) donde se guardan los videos subidos, dentro de la carpeta única "archivos/". */
-    private const CARPETA_VIDEOS = BASE_PATH . '/archivos/videos/';
-
-    /** Carpeta local (fuera del control de versiones) donde se guardan las imágenes subidas, dentro de la carpeta única "archivos/". */
-    private const CARPETA_IMAGENES = BASE_PATH . '/archivos/imagenes/';
-
     private Ejercicio $ejercicioModelo;
     private GrupoMuscular $grupoMuscularModelo;
     private EjercicioGrupoMuscular $ejercicioGrupoModelo;
@@ -100,9 +82,9 @@ class EjercicioController
         $datos = $this->datosFormulario();
         $gruposSeleccionados = array_map('intval', $_POST['grupos'] ?? []);
 
-        [$video, $errorVideo] = $this->procesarVideo(null);
-        [$imagen1, $errorImagen1] = $this->procesarImagen('imagen_1', null);
-        [$imagen2, $errorImagen2] = $this->procesarImagen('imagen_2', null);
+        [$video, $errorVideo] = $this->ejercicioModelo->guardarVideo($_FILES['video'] ?? null, null);
+        [$imagen1, $errorImagen1] = $this->ejercicioModelo->guardarImagen($_FILES['imagen_1'] ?? null, null);
+        [$imagen2, $errorImagen2] = $this->ejercicioModelo->guardarImagen($_FILES['imagen_2'] ?? null, null);
         $error = $errorVideo ?? $errorImagen1 ?? $errorImagen2 ?? $this->validar($datos['nombre'], null);
 
         if ($error !== null) {
@@ -162,9 +144,9 @@ class EjercicioController
         $datos = $this->datosFormulario();
         $gruposSeleccionados = array_map('intval', $_POST['grupos'] ?? []);
 
-        [$video, $errorVideo] = $this->procesarVideo($ejercicioExistente['url_video']);
-        [$imagen1, $errorImagen1] = $this->procesarImagen('imagen_1', $ejercicioExistente['url_imagen_1']);
-        [$imagen2, $errorImagen2] = $this->procesarImagen('imagen_2', $ejercicioExistente['url_imagen_2']);
+        [$video, $errorVideo] = $this->ejercicioModelo->guardarVideo($_FILES['video'] ?? null, $ejercicioExistente['url_video']);
+        [$imagen1, $errorImagen1] = $this->ejercicioModelo->guardarImagen($_FILES['imagen_1'] ?? null, $ejercicioExistente['url_imagen_1']);
+        [$imagen2, $errorImagen2] = $this->ejercicioModelo->guardarImagen($_FILES['imagen_2'] ?? null, $ejercicioExistente['url_imagen_2']);
         $error = $errorVideo ?? $errorImagen1 ?? $errorImagen2 ?? $this->validar($datos['nombre'], $id);
 
         if ($error !== null) {
@@ -219,7 +201,7 @@ class EjercicioController
         $this->redirect('ejercicio', 'index');
     }
 
-    /** Extrae y normaliza los campos del formulario de ejercicio (crear o editar). El video se procesa aparte, ver procesarVideo(). */
+    /** Extrae y normaliza los campos del formulario de ejercicio (crear o editar). El video y las imágenes se guardan aparte, ver Ejercicio::guardarVideo() y Ejercicio::guardarImagen(). */
     private function datosFormulario(): array
     {
         $nombre = $_POST['nombre'] ?? $_GET['nombre'] ?? '';
@@ -237,100 +219,6 @@ class EjercicioController
             'beneficio' => $beneficio ?: null,
             'indicaciones' => $indicaciones ?: null,
         ];
-    }
-
-    /**
-     * Procesa el archivo de video local subido en el campo "video" del formulario.
-     * Si no se subió un archivo nuevo, conserva $videoActual (el que ya tenía el
-     * ejercicio al editar, o null al crear uno nuevo). Devuelve [nombreDeArchivo, error].
-     */
-    private function procesarVideo(?string $videoActual): array
-    {
-        if (!isset($_FILES['video']) || $_FILES['video']['error'] === UPLOAD_ERR_NO_FILE) {
-            return [$videoActual, null];
-        }
-
-        if ($_FILES['video']['error'] !== UPLOAD_ERR_OK) {
-            return [$videoActual, match ($_FILES['video']['error']) {
-                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE =>
-                    'El video supera el tamaño máximo permitido por la configuración actual del servidor (upload_max_filesize/post_max_size en php.ini). Pide al administrador del servidor que los aumente.',
-                UPLOAD_ERR_PARTIAL => 'El video se subió solo parcialmente. Revisa tu conexión e inténtalo de nuevo.',
-                UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION =>
-                    'El servidor no pudo procesar el archivo subido. Inténtalo de nuevo más tarde.',
-                default => 'Ocurrió un error al subir el video. Inténtalo de nuevo.',
-            }];
-        }
-
-        if ($_FILES['video']['size'] > self::TAMANO_MAXIMO_VIDEO) {
-            return [$videoActual, 'El video no puede superar los 100 MB.'];
-        }
-
-        $extension = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($extension, self::EXTENSIONES_VIDEO_PERMITIDAS, true)) {
-            return [$videoActual, 'El video debe ser un archivo MP4, WEBM, OGG o MOV.'];
-        }
-
-        if (!is_dir(self::CARPETA_VIDEOS) && !mkdir(self::CARPETA_VIDEOS, 0755, true) && !is_dir(self::CARPETA_VIDEOS)) {
-            return [$videoActual, 'No se pudo preparar el almacenamiento de videos en el servidor.'];
-        }
-
-        // Nombre aleatorio para evitar colisiones y no depender del nombre original del archivo.
-        $nombreArchivo = bin2hex(random_bytes(16)) . '.' . $extension;
-
-        if (!move_uploaded_file($_FILES['video']['tmp_name'], self::CARPETA_VIDEOS . $nombreArchivo)) {
-            return [$videoActual, 'No se pudo guardar el video en el servidor.'];
-        }
-
-        return [$nombreArchivo, null];
-    }
-
-    /**
-     * Procesa el archivo de imagen local subido en el campo $campoFormulario del
-     * formulario (el ejercicio admite dos imágenes: "imagen_1" e "imagen_2", cada
-     * una se procesa con su propia llamada a este método). Si no se subió un
-     * archivo nuevo, conserva $imagenActual (la que ya tenía el ejercicio en esa
-     * posición al editar, o null al crear uno nuevo). Devuelve [nombreDeArchivo, error].
-     */
-    private function procesarImagen(string $campoFormulario, ?string $imagenActual): array
-    {
-        if (!isset($_FILES[$campoFormulario]) || $_FILES[$campoFormulario]['error'] === UPLOAD_ERR_NO_FILE) {
-            return [$imagenActual, null];
-        }
-
-        if ($_FILES[$campoFormulario]['error'] !== UPLOAD_ERR_OK) {
-            return [$imagenActual, match ($_FILES[$campoFormulario]['error']) {
-                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE =>
-                    'La imagen supera el tamaño máximo permitido por la configuración actual del servidor (upload_max_filesize/post_max_size en php.ini). Pide al administrador del servidor que los aumente.',
-                UPLOAD_ERR_PARTIAL => 'La imagen se subió solo parcialmente. Revisa tu conexión e inténtalo de nuevo.',
-                UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION =>
-                    'El servidor no pudo procesar el archivo subido. Inténtalo de nuevo más tarde.',
-                default => 'Ocurrió un error al subir la imagen. Inténtalo de nuevo.',
-            }];
-        }
-
-        if ($_FILES[$campoFormulario]['size'] > self::TAMANO_MAXIMO_IMAGEN) {
-            return [$imagenActual, 'La imagen no puede superar los 10 MB.'];
-        }
-
-        $extension = strtolower(pathinfo($_FILES[$campoFormulario]['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($extension, self::EXTENSIONES_IMAGEN_PERMITIDAS, true)) {
-            return [$imagenActual, 'La imagen debe ser un archivo JPG, PNG, WEBP o GIF.'];
-        }
-
-        if (!is_dir(self::CARPETA_IMAGENES) && !mkdir(self::CARPETA_IMAGENES, 0755, true) && !is_dir(self::CARPETA_IMAGENES)) {
-            return [$imagenActual, 'No se pudo preparar el almacenamiento de imágenes en el servidor.'];
-        }
-
-        // Nombre aleatorio para evitar colisiones y no depender del nombre original del archivo.
-        $nombreArchivo = bin2hex(random_bytes(16)) . '.' . $extension;
-
-        if (!move_uploaded_file($_FILES[$campoFormulario]['tmp_name'], self::CARPETA_IMAGENES . $nombreArchivo)) {
-            return [$imagenActual, 'No se pudo guardar la imagen en el servidor.'];
-        }
-
-        return [$nombreArchivo, null];
     }
 
     /** El nombre es obligatorio y único en el catálogo (coincide con la restricción UNIQUE de la tabla). */
