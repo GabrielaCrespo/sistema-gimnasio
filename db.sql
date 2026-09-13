@@ -92,7 +92,9 @@ CREATE TABLE EJERCICIO (
     descripcion         TEXT,
     beneficio           TEXT,
     indicaciones        TEXT,
-    url_video           VARCHAR(255)
+    url_video           VARCHAR(255),
+    url_imagen_1        VARCHAR(255),
+    url_imagen_2        VARCHAR(255)
 );
 
 

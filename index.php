@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 // Cuando se ejecuta con el servidor embebido de PHP (`php -S`, solo para
 // pruebas locales) se le indica que sirva directamente los archivos
-// estáticos que ya existen en disco -como los videos subidos en /videos/-
+// estáticos que ya existen en disco -como los videos e imágenes subidos en /archivos/-
 // en vez de pasar por este front controller. En un hosting real
 // (Apache/Nginx) esto no hace falta: el propio servidor ya sirve esos
 // archivos sin tocar index.php.
@@ -53,11 +53,11 @@ spl_autoload_register(function (string $clase): void {
     }
 });
 
-/** Página mínima de error 404, usada solo cuando el controlador o la acción pedidos no existen. */
+/** Carga la vista de error 404, usada solo cuando el controlador o la acción pedidos no existen. */
 function paginaNoEncontrada(): void
 {
     http_response_code(404);
-    echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">404 &mdash; Página no encontrada</h1><p style="color:#6c6459;margin-bottom:20px;">La página que buscas no existe.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+    require BASE_PATH . '/vistas/404.php';
 }
 
 // El nombre del controlador llega en minúsculas/camelCase desde la URL

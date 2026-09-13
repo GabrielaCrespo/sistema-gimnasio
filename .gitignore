@@ -9,9 +9,12 @@
 /storage/logs/*
 *.log
 
-# VIDEOS LOCALES DE EJERCICIOS (subidos por el administrador/instructor)
-/videos/*
-!/videos/.gitkeep
+# VIDEOS E IMÁGENES LOCALES DE EJERCICIOS (subidos por el administrador/instructor),
+# ambos dentro de una única carpeta "archivos/" con una subcarpeta por tipo.
+/archivos/videos/*
+!/archivos/videos/.gitkeep
+/archivos/imagenes/*
+!/archivos/imagenes/.gitkeep
 
 # ARCHIVOS TEMPORALES
 *.tmp

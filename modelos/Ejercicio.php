@@ -18,8 +18,8 @@ class Ejercicio
 
     public function crear(array $datos): int
     {
-        $sql = 'INSERT INTO EJERCICIO (nombre, descripcion, beneficio, indicaciones, url_video)
-                VALUES (:nombre, :descripcion, :beneficio, :indicaciones, :url_video)
+        $sql = 'INSERT INTO EJERCICIO (nombre, descripcion, beneficio, indicaciones, url_video, url_imagen_1, url_imagen_2)
+                VALUES (:nombre, :descripcion, :beneficio, :indicaciones, :url_video, :url_imagen_1, :url_imagen_2)
                 RETURNING id_ejercicio';
 
         $sentencia = $this->db->prepare($sql);
@@ -29,6 +29,8 @@ class Ejercicio
             'beneficio' => $datos['beneficio'],
             'indicaciones' => $datos['indicaciones'],
             'url_video' => $datos['url_video'],
+            'url_imagen_1' => $datos['url_imagen_1'],
+            'url_imagen_2' => $datos['url_imagen_2'],
         ]);
 
         return (int) $sentencia->fetchColumn();
@@ -38,7 +40,8 @@ class Ejercicio
     {
         $sql = 'UPDATE EJERCICIO
                 SET nombre = :nombre, descripcion = :descripcion, beneficio = :beneficio,
-                    indicaciones = :indicaciones, url_video = :url_video
+                    indicaciones = :indicaciones, url_video = :url_video,
+                    url_imagen_1 = :url_imagen_1, url_imagen_2 = :url_imagen_2
                 WHERE id_ejercicio = :id';
 
         $sentencia = $this->db->prepare($sql);
@@ -48,6 +51,8 @@ class Ejercicio
             'beneficio' => $datos['beneficio'],
             'indicaciones' => $datos['indicaciones'],
             'url_video' => $datos['url_video'],
+            'url_imagen_1' => $datos['url_imagen_1'],
+            'url_imagen_2' => $datos['url_imagen_2'],
             'id' => $id,
         ]);
     }

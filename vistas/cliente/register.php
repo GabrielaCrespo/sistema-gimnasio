@@ -1,17 +1,17 @@
 <?php
 /**
- * Vista de autenticación (login + registro público de clientes).
- * LoginController decide con $accion cuál de los dos formularios mostrar.
- * No incluye barra de navegación: solo se llega aquí sin sesión activa.
+ * Formulario público de auto-registro de clientes (ClienteController::register).
+ * No lleva barra de navegación: solo se llega aquí sin sesión activa.
+ *
+ * Recibe del controlador: $datos, $error.
  */
-$datos = $datos ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $accion === 'register' ? 'Crear Cuenta' : 'Iniciar Sesión' ?> - Gimnasio</title>
+    <title>Crear Cuenta - Gimnasio</title>
     <!-- Tipografía profesional -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -274,8 +274,6 @@ $datos = $datos ?? [];
 
 <main class="contenedor">
 
-<?php if ($accion === 'register'): ?>
-
     <section class="auth-panel auth-panel-registro">
         <div class="auth-cabecera">
             <span class="auth-marca-icono">
@@ -337,42 +335,6 @@ $datos = $datos ?? [];
         <p class="auth-pie">¿Ya tienes cuenta? <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'login']) ?>">Inicia sesión</a></p>
         <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>" class="auth-volver">← Volver al inicio</a>
     </section>
-
-<?php else: ?>
-
-    <section class="auth-panel auth-panel-login">
-        <div class="auth-cabecera">
-            <span class="auth-marca-icono">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
-            </span>
-            <h1>Iniciar sesión</h1>
-            <p>Ingresa tus credenciales para acceder a tu panel</p>
-        </div>
-
-        <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'autenticar']) ?>">
-            <div class="campo">
-                <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" name="correo" placeholder="nombre@ejemplo.com" required autofocus>
-            </div>
-            <div class="campo">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
-            </div>
-            <button type="submit" class="boton-auth">Ingresar al sistema</button>
-        </form>
-
-        <p class="auth-pie">¿No tienes cuenta? <a href="<?= '/index.php?' . http_build_query(['controller' => 'cliente', 'action' => 'register']) ?>">Regístrate como cliente</a></p>
-        <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'index']) ?>" class="auth-volver">← Volver al inicio</a>
-    </section>
-
-<?php endif; ?>
 
 </main>
 

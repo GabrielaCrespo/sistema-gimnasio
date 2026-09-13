@@ -23,8 +23,12 @@ class EvaluacionFisicaController
     {
         $this->requireRole(['instructor']);
 
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+        $datos = [];
         $clientes = $this->clienteModelo->listarTodos();
-        $this->render('registrar', ['error' => null, 'datos' => [], 'clientes' => $clientes]);
+
+        require BASE_PATH . '/vistas/evaluacion/registrar.php';
     }
 
     /** Procesa el registro de una nueva evaluación física. */
@@ -69,11 +73,10 @@ class EvaluacionFisicaController
         $error = $this->validar($datos);
 
         if ($error !== null) {
-            $this->render('registrar', [
-                'error' => $error,
-                'datos' => $datos,
-                'clientes' => $this->clienteModelo->listarTodos(),
-            ]);
+            $usuarioSesion = $_SESSION['user'];
+            $clientes = $this->clienteModelo->listarTodos();
+
+            require BASE_PATH . '/vistas/evaluacion/registrar.php';
             return;
         }
 
@@ -96,6 +99,162 @@ class EvaluacionFisicaController
         $this->redirect('evaluacionFisica', 'historial', ['id' => $datos['id_cliente']]);
     }
 
+    /** Formulario para editar una evaluación ya registrada. Solo puede editarla el instructor que la registró. */
+    public function editar(): void
+    {
+        $this->requireRole(['instructor']);
+
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
+        $evaluacion = $this->evaluacionModelo->buscarPorId($id);
+
+        if (!$evaluacion || !$this->esPropietario($evaluacion)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $cliente = $this->clienteModelo->buscarPorId((int) $evaluacion['id_cliente']);
+
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+
+        require BASE_PATH . '/vistas/evaluacion/editar.php';
+    }
+
+    /** Procesa la edición de una evaluación física ya registrada. */
+    public function actualizar(): void
+    {
+        $this->requireRole(['instructor']);
+
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
+        $evaluacion = $this->evaluacionModelo->buscarPorId($id);
+
+        if (!$evaluacion || !$this->esPropietario($evaluacion)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
+            $this->redirect('evaluacionFisica', 'editar', ['id' => $id]);
+            return;
+        }
+
+        $peso = $_POST['peso'] ?? $_GET['peso'] ?? '';
+        if (is_string($peso)) { $peso = trim($peso); }
+        $altura = $_POST['altura'] ?? $_GET['altura'] ?? '';
+        if (is_string($altura)) { $altura = trim($altura); }
+        $objetivo = $_POST['objetivo'] ?? $_GET['objetivo'] ?? '';
+        if (is_string($objetivo)) { $objetivo = trim($objetivo); }
+        $porcentajeGrasa = $_POST['porcentaje_grasa'] ?? $_GET['porcentaje_grasa'] ?? '';
+        if (is_string($porcentajeGrasa)) { $porcentajeGrasa = trim($porcentajeGrasa); }
+        $masaMuscular = $_POST['masa_muscular'] ?? $_GET['masa_muscular'] ?? '';
+        if (is_string($masaMuscular)) { $masaMuscular = trim($masaMuscular); }
+        $flexibilidad = $_POST['flexibilidad'] ?? $_GET['flexibilidad'] ?? '';
+        if (is_string($flexibilidad)) { $flexibilidad = trim($flexibilidad); }
+        $observaciones = $_POST['observaciones'] ?? $_GET['observaciones'] ?? '';
+        if (is_string($observaciones)) { $observaciones = trim($observaciones); }
+
+        $datos = [
+            'peso' => $peso,
+            'altura' => $altura,
+            'objetivo' => $objetivo ?: null,
+            'porcentaje_grasa' => $porcentajeGrasa,
+            'masa_muscular' => $masaMuscular,
+            'flexibilidad' => $flexibilidad,
+            'observaciones' => $observaciones ?: null,
+        ];
+
+        $error = $this->validar([...$datos, 'id_cliente' => (int) $evaluacion['id_cliente']]);
+
+        if ($error !== null) {
+            $usuarioSesion = $_SESSION['user'];
+            $cliente = $this->clienteModelo->buscarPorId((int) $evaluacion['id_cliente']);
+            $evaluacion = [...$evaluacion, ...$datos];
+
+            require BASE_PATH . '/vistas/evaluacion/editar.php';
+            return;
+        }
+
+        $this->evaluacionModelo->actualizar($id, [
+            'peso' => $datos['peso'],
+            'altura' => $datos['altura'],
+            'objetivo' => $datos['objetivo'],
+            'porcentaje_grasa' => $datos['porcentaje_grasa'] !== '' ? $datos['porcentaje_grasa'] : null,
+            'masa_muscular' => $datos['masa_muscular'] !== '' ? $datos['masa_muscular'] : null,
+            'flexibilidad' => $datos['flexibilidad'] !== '' ? $datos['flexibilidad'] : null,
+            'observaciones' => $datos['observaciones'],
+        ]);
+
+        // Igual que al registrar: refleja el peso/altura editados en CLIENTE, que es lo que se muestra en su perfil.
+        $this->clienteModelo->actualizarMedidas((int) $evaluacion['id_cliente'], (float) $datos['altura'], (float) $datos['peso']);
+
+        $this->redirect('evaluacionFisica', 'historial', ['id' => $evaluacion['id_cliente']]);
+    }
+
+    /** Muestra el detalle completo de una evaluación (incluye observaciones, que la tabla del historial no muestra). */
+    public function ver(): void
+    {
+        $this->requireRole(['instructor', 'cliente']);
+
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
+        $evaluacion = $this->evaluacionModelo->buscarPorIdConNombres($id);
+
+        if (!$evaluacion || !$this->tieneAcceso($evaluacion)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $usuarioSesion = $_SESSION['user'];
+
+        require BASE_PATH . '/vistas/evaluacion/ver.php';
+    }
+
+    /** Elimina una evaluación ya registrada. Solo puede borrarla el instructor que la registró. */
+    public function eliminar(): void
+    {
+        $this->requireRole(['instructor']);
+
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
+            $this->redirect('evaluacionFisica', 'historial');
+            return;
+        }
+
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
+        $evaluacion = $this->evaluacionModelo->buscarPorId($id);
+
+        if (!$evaluacion || !$this->esPropietario($evaluacion)) {
+            $this->paginaNoEncontrada();
+            return;
+        }
+
+        $this->evaluacionModelo->eliminar($id);
+
+        $this->redirect('evaluacionFisica', 'historial', ['id' => $evaluacion['id_cliente']]);
+    }
+
+    /** true si la evaluación fue registrada por el instructor en sesión (única acción autorizada a editarla o borrarla). */
+    private function esPropietario(array $evaluacion): bool
+    {
+        return (int) $evaluacion['id_instructor'] === (int) $_SESSION['user']['id'];
+    }
+
+    /** true si el usuario en sesión puede VER la evaluación: el instructor que la registró, cualquier otro instructor, o el cliente al que pertenece. */
+    private function tieneAcceso(array $evaluacion): bool
+    {
+        if ($_SESSION['user']['rol'] === 'instructor') {
+            return true;
+        }
+
+        return (int) $evaluacion['id_cliente'] === (int) $_SESSION['user']['id'];
+    }
+
     /**
      * CU05: muestra el historial de evaluaciones. Un instructor puede
      * consultar el de cualquier cliente (elige uno de una lista si no
@@ -106,13 +265,16 @@ class EvaluacionFisicaController
     {
         $this->requireRole(['instructor', 'cliente']);
 
+        $usuarioSesion = $_SESSION['user'];
+
         if ($_SESSION['user']['rol'] === 'cliente') {
             $idCliente = (int) $_SESSION['user']['id'];
-            $this->render('historial', [
-                'evaluaciones' => $this->evaluacionModelo->listarPorCliente($idCliente),
-                'clientes' => null,
-                'clienteSeleccionado' => null,
-            ]);
+
+            $evaluaciones = $this->evaluacionModelo->listarPorCliente($idCliente);
+            $clientes = null;
+            $clienteSeleccionado = null;
+
+            require BASE_PATH . '/vistas/evaluacion/historial.php';
             return;
         }
 
@@ -124,22 +286,17 @@ class EvaluacionFisicaController
         $clientes = $this->clienteModelo->listarTodos();
 
         if ($idCliente === 0) {
-            $this->render('historial', [
-                'evaluaciones' => [],
-                'clientes' => $clientes,
-                'clienteSeleccionado' => null,
-            ]);
+            $evaluaciones = [];
+            $clienteSeleccionado = null;
+
+            require BASE_PATH . '/vistas/evaluacion/historial.php';
             return;
         }
 
         $clienteSeleccionado = $this->clienteModelo->buscarPorId($idCliente);
         $evaluaciones = $clienteSeleccionado ? $this->evaluacionModelo->listarPorCliente($idCliente) : [];
 
-        $this->render('historial', [
-            'evaluaciones' => $evaluaciones,
-            'clientes' => $clientes,
-            'clienteSeleccionado' => $clienteSeleccionado,
-        ]);
+        require BASE_PATH . '/vistas/evaluacion/historial.php';
     }
 
     /** Valida los campos obligatorios de una evaluación física. */
@@ -164,6 +321,13 @@ class EvaluacionFisicaController
         return null;
     }
 
+    /** Carga la vista de error 404 cuando se pide una evaluación que no existe o que registró otro instructor. */
+    private function paginaNoEncontrada(): void
+    {
+        http_response_code(404);
+        require BASE_PATH . '/vistas/404.php';
+    }
+
     /** Exige sesión activa; si no la hay, redirige al login y detiene la ejecución. */
     private function requireAuth(): void
     {
@@ -181,16 +345,9 @@ class EvaluacionFisicaController
 
         if (!in_array($rolActual, $rolesPermitidos, true)) {
             http_response_code(403);
-            echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">403 &mdash; Acceso denegado</h1><p style="color:#6c6459;margin-bottom:20px;">No tienes permisos para acceder a esta sección del sistema.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+            require BASE_PATH . '/vistas/403.php';
             exit;
         }
-    }
-
-    /** Muestra la vista de evaluación física (vistas/evaluacion.php decide el contenido según $accion). */
-    private function render(string $accion, array $datos = []): void
-    {
-        extract($datos);
-        require BASE_PATH . '/vistas/evaluacion.php';
     }
 
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */

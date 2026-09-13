@@ -35,11 +35,12 @@ class RutinaController
         $idUsuario = (int) $_SESSION['user']['id'];
         $rol = $_SESSION['user']['rol'];
 
+        $usuarioSesion = $_SESSION['user'];
         $rutinas = $rol === 'instructor'
             ? $this->rutinaModelo->listarPorInstructor($idUsuario)
             : $this->rutinaModelo->listarPorCliente($idUsuario);
 
-        $this->render('listar', ['rutinas' => $rutinas, 'rol' => $rol]);
+        require BASE_PATH . '/vistas/rutina/listar.php';
     }
 
     /** Muestra el detalle de una rutina y sus ejercicios agrupados por día, tanto para el instructor como para el cliente (CU06). */
@@ -57,8 +58,10 @@ class RutinaController
             return;
         }
 
-        $detalle = $this->detalleModelo->listarPorRutina($id);
-        $this->render('ver', ['rutina' => $rutina, 'detallePorDia' => $this->agruparPorDia($detalle)]);
+        $usuarioSesion = $_SESSION['user'];
+        $detallePorDia = $this->agruparPorDia($this->detalleModelo->listarPorRutina($id));
+
+        require BASE_PATH . '/vistas/rutina/ver.php';
     }
 
     /** Formulario para crear una rutina nueva, eligiendo el cliente al que se le asigna. */
@@ -66,8 +69,12 @@ class RutinaController
     {
         $this->requireRole(['instructor']);
 
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+        $datos = [];
         $clientes = $this->clienteModelo->listarTodos();
-        $this->render('crear', ['error' => null, 'datos' => [], 'clientes' => $clientes]);
+
+        require BASE_PATH . '/vistas/rutina/crear.php';
     }
 
     /** Procesa la creación de la rutina; luego redirige a "asignar" para agregarle ejercicios. */
@@ -103,7 +110,10 @@ class RutinaController
         $error = $this->validarDatosGenerales($datos);
 
         if ($error !== null) {
-            $this->render('crear', ['error' => $error, 'datos' => $datos, 'clientes' => $this->clienteModelo->listarTodos()]);
+            $usuarioSesion = $_SESSION['user'];
+            $clientes = $this->clienteModelo->listarTodos();
+
+            require BASE_PATH . '/vistas/rutina/crear.php';
             return;
         }
 
@@ -130,7 +140,10 @@ class RutinaController
             return;
         }
 
-        $this->render('editar', ['error' => null, 'rutina' => $rutina]);
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+
+        require BASE_PATH . '/vistas/rutina/editar.php';
     }
 
     public function actualizar(): void
@@ -173,7 +186,10 @@ class RutinaController
         }
 
         if ($error !== null) {
-            $this->render('editar', ['error' => $error, 'rutina' => [...$rutina, ...$datos]]);
+            $usuarioSesion = $_SESSION['user'];
+            $rutina = [...$rutina, ...$datos];
+
+            require BASE_PATH . '/vistas/rutina/editar.php';
             return;
         }
 
@@ -197,13 +213,13 @@ class RutinaController
             return;
         }
 
-        $this->render('asignar', [
-            'error' => null,
-            'rutina' => $rutina,
-            'detalle' => $this->detalleModelo->listarPorRutina($id),
-            'ejercicios' => $this->ejercicioModelo->listarTodos(),
-            'dias' => self::DIAS_SEMANA,
-        ]);
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+        $detalle = $this->detalleModelo->listarPorRutina($id);
+        $ejercicios = $this->ejercicioModelo->listarTodos();
+        $dias = self::DIAS_SEMANA;
+
+        require BASE_PATH . '/vistas/rutina/asignar.php';
     }
 
     /** Agrega un ejercicio (día, series, repeticiones, peso, descanso, orden) a la rutina. */
@@ -260,13 +276,12 @@ class RutinaController
         $error = $this->validarDetalle($datos);
 
         if ($error !== null) {
-            $this->render('asignar', [
-                'error' => $error,
-                'rutina' => $rutina,
-                'detalle' => $this->detalleModelo->listarPorRutina($id),
-                'ejercicios' => $this->ejercicioModelo->listarTodos(),
-                'dias' => self::DIAS_SEMANA,
-            ]);
+            $usuarioSesion = $_SESSION['user'];
+            $detalle = $this->detalleModelo->listarPorRutina($id);
+            $ejercicios = $this->ejercicioModelo->listarTodos();
+            $dias = self::DIAS_SEMANA;
+
+            require BASE_PATH . '/vistas/rutina/asignar.php';
             return;
         }
 
@@ -300,13 +315,12 @@ class RutinaController
             return;
         }
 
-        $this->render('editarEjercicio', [
-            'error' => null,
-            'rutina' => $rutina,
-            'detalle' => $detalle,
-            'ejercicios' => $this->ejercicioModelo->listarTodos(),
-            'dias' => self::DIAS_SEMANA,
-        ]);
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+        $ejercicios = $this->ejercicioModelo->listarTodos();
+        $dias = self::DIAS_SEMANA;
+
+        require BASE_PATH . '/vistas/rutina/editar_ejercicio.php';
     }
 
     /** Procesa la edición de una fila de DETALLE_RUTINA ya asignada a la rutina. */
@@ -373,13 +387,12 @@ class RutinaController
         $error = $this->validarDetalle($datos);
 
         if ($error !== null) {
-            $this->render('editarEjercicio', [
-                'error' => $error,
-                'rutina' => $rutina,
-                'detalle' => ['id_detalle' => $idDetalle, ...$datos],
-                'ejercicios' => $this->ejercicioModelo->listarTodos(),
-                'dias' => self::DIAS_SEMANA,
-            ]);
+            $usuarioSesion = $_SESSION['user'];
+            $detalle = ['id_detalle' => $idDetalle, ...$datos];
+            $ejercicios = $this->ejercicioModelo->listarTodos();
+            $dias = self::DIAS_SEMANA;
+
+            require BASE_PATH . '/vistas/rutina/editar_ejercicio.php';
             return;
         }
 
@@ -487,11 +500,11 @@ class RutinaController
         return null;
     }
 
-    /** Muestra un error 404 minimal cuando se pide una rutina que no existe o a la que no se tiene acceso. */
+    /** Carga la vista de error 404 cuando se pide una rutina que no existe o a la que no se tiene acceso. */
     private function paginaNoEncontrada(): void
     {
         http_response_code(404);
-        echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">404 &mdash; Página no encontrada</h1><p style="color:#6c6459;margin-bottom:20px;">La página que buscas no existe.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+        require BASE_PATH . '/vistas/404.php';
     }
 
     /** Exige sesión activa; si no la hay, redirige al login y detiene la ejecución. */
@@ -511,16 +524,9 @@ class RutinaController
 
         if (!in_array($rolActual, $rolesPermitidos, true)) {
             http_response_code(403);
-            echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">403 &mdash; Acceso denegado</h1><p style="color:#6c6459;margin-bottom:20px;">No tienes permisos para acceder a esta sección del sistema.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+            require BASE_PATH . '/vistas/403.php';
             exit;
         }
-    }
-
-    /** Muestra la vista de rutina (vistas/rutina.php decide el contenido según $accion). */
-    private function render(string $accion, array $datos = []): void
-    {
-        extract($datos);
-        require BASE_PATH . '/vistas/rutina.php';
     }
 
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */

@@ -12,11 +12,13 @@ class ClienteController
 {
     private Cliente $clienteModelo;
     private Instructor $instructorModelo;
+    private Administrador $administradorModelo;
 
     public function __construct()
     {
         $this->clienteModelo = new Cliente();
         $this->instructorModelo = new Instructor();
+        $this->administradorModelo = new Administrador();
     }
 
     /** Lista todas las cuentas de cliente. Solo el administrador gestiona cuentas ajenas. */
@@ -24,8 +26,10 @@ class ClienteController
     {
         $this->requireRole(['administrador']);
 
+        $usuarioSesion = $_SESSION['user'];
         $clientes = $this->clienteModelo->listarTodos();
-        $this->render('listar', ['clientes' => $clientes]);
+
+        require BASE_PATH . '/vistas/cliente/listar.php';
     }
 
     /** Muestra la vista de auto-registro público (siempre crea una cuenta de tipo cliente). */
@@ -37,7 +41,10 @@ class ClienteController
         }
 
         // Envía a la vista de registro con datos vacíos y sin error
-        $this->renderPublico('register', ['error' => null, 'datos' => []]);
+        $error = null;
+        $datos = [];
+
+        require BASE_PATH . '/vistas/cliente/register.php';
     }
 
     // Procesa el formulario de registro de un nuevo cliente
@@ -76,7 +83,7 @@ class ClienteController
         $error = $this->validarRegistro($datos, $password, $passwordConfirmacion);
 
         if ($error !== null) {
-            $this->renderPublico('register', ['error' => $error, 'datos' => $datos]);
+            require BASE_PATH . '/vistas/cliente/register.php';
             return;
         }
 
@@ -105,7 +112,10 @@ class ClienteController
             return;
         }
 
-        $this->render('editar', ['error' => null, 'cliente' => $cliente]);
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+
+        require BASE_PATH . '/vistas/cliente/editar.php';
     }
 
     /** Procesa la edición de datos personales de un cliente. La contraseña no se cambia desde este formulario. */
@@ -145,7 +155,10 @@ class ClienteController
         $error = $this->validarDatosBasicos($datos, $id);
 
         if ($error !== null) {
-            $this->render('editar', ['error' => $error, 'cliente' => [...$cliente, ...$datos]]);
+            $usuarioSesion = $_SESSION['user'];
+            $cliente = [...$cliente, ...$datos];
+
+            require BASE_PATH . '/vistas/cliente/editar.php';
             return;
         }
 
@@ -183,11 +196,12 @@ class ClienteController
 
         $id = (int) $_SESSION['user']['id'];
 
-        $this->render('perfil', [
-            'error' => null,
-            'exito' => null,
-            'cliente' => $this->clienteModelo->buscarPorId($id),
-        ]);
+        $usuarioSesion = $_SESSION['user'];
+        $error = null;
+        $exito = null;
+        $cliente = $this->clienteModelo->buscarPorId($id);
+
+        require BASE_PATH . '/vistas/cliente/perfil.php';
     }
 
     /** Procesa la edición del perfil propio: datos personales, altura y peso. */
@@ -224,11 +238,11 @@ class ClienteController
         $error = $this->validarDatosBasicos($datos, $id);
 
         if ($error !== null) {
-            $this->render('perfil', [
-                'error' => $error,
-                'exito' => null,
-                'cliente' => [...$this->clienteModelo->buscarPorId($id), ...$datos],
-            ]);
+            $usuarioSesion = $_SESSION['user'];
+            $exito = null;
+            $cliente = [...$this->clienteModelo->buscarPorId($id), ...$datos];
+
+            require BASE_PATH . '/vistas/cliente/perfil.php';
             return;
         }
 
@@ -248,11 +262,11 @@ class ClienteController
         $_SESSION['user']['nombre'] = $datos['nombres'] . ' ' . $datos['apellidos'];
         $_SESSION['user']['correo'] = $datos['correo'];
 
-        $this->render('perfil', [
-            'error' => null,
-            'exito' => 'Tus datos se actualizaron correctamente.',
-            'cliente' => $this->clienteModelo->buscarPorId($id),
-        ]);
+        $usuarioSesion = $_SESSION['user'];
+        $exito = 'Tus datos se actualizaron correctamente.';
+        $cliente = $this->clienteModelo->buscarPorId($id);
+
+        require BASE_PATH . '/vistas/cliente/perfil.php';
     }
 
     /** Valida los datos del formulario de registro; devuelve el mensaje de error o null si todo está correcto. */
@@ -278,7 +292,7 @@ class ClienteController
 
         // El correo/CI deben ser únicos en todo el sistema, no solo en CLIENTE:
         // de lo contrario, esa cuenta quedaría inaccesible al iniciar sesión.
-        if ($datos['correo'] === Config::get('ADMIN_CORREO', '')
+        if ($this->administradorModelo->esCorreoDelAdministrador($datos['correo'])
             || $this->clienteModelo->existeCorreo($datos['correo'])
             || $this->instructorModelo->existeCorreo($datos['correo'])
         ) {
@@ -307,7 +321,7 @@ class ClienteController
         }
 
         // El correo/CI deben ser únicos en todo el sistema, no solo en CLIENTE.
-        if ($datos['correo'] === Config::get('ADMIN_CORREO', '')
+        if ($this->administradorModelo->esCorreoDelAdministrador($datos['correo'])
             || $this->clienteModelo->existeCorreo($datos['correo'], $idAExcluir)
             || $this->instructorModelo->existeCorreo($datos['correo'])
         ) {
@@ -321,11 +335,11 @@ class ClienteController
         return null;
     }
 
-    /** Muestra un error 404 minimal cuando se pide un id_cliente que no existe. */
+    /** Carga la vista de error 404 cuando se pide un id_cliente que no existe. */
     private function paginaNoEncontrada(): void
     {
         http_response_code(404);
-        echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">404 &mdash; Página no encontrada</h1><p style="color:#6c6459;margin-bottom:20px;">La página que buscas no existe.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+        require BASE_PATH . '/vistas/404.php';
     }
 
     /** Exige sesión activa; si no la hay, redirige al login y detiene la ejecución. */
@@ -345,23 +359,9 @@ class ClienteController
 
         if (!in_array($rolActual, $rolesPermitidos, true)) {
             http_response_code(403);
-            echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sistema de Gestión de Gimnasio</title></head><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;background:#f6f5f2;color:#24211c;"><main style="max-width:1100px;margin:0 auto;padding:32px 20px 56px;"><section style="text-align:center;padding:72px 20px;background:#fff;border:1px solid #e6e2da;border-top:3px solid #d9782e;border-radius:10px;box-shadow:0 1px 2px rgba(20,15,10,.08);"><h1 style="font-size:1.6rem;margin-bottom:8px;">403 &mdash; Acceso denegado</h1><p style="color:#6c6459;margin-bottom:20px;">No tienes permisos para acceder a esta sección del sistema.</p><a style="display:inline-flex;padding:10px 18px;border-radius:6px;background:#d9782e;color:#fff;font-weight:700;text-decoration:none;" href="/index.php">Volver al inicio</a></section></main></body></html>';
+            require BASE_PATH . '/vistas/403.php';
             exit;
         }
-    }
-
-    /** Muestra la vista de cliente (vistas/cliente.php decide el contenido según $accion). */
-    private function render(string $accion, array $datos = []): void
-    {
-        extract($datos);
-        require BASE_PATH . '/vistas/cliente.php';
-    }
-
-    /** Muestra el registro público reutilizando la vista de autenticación (vistas/login.php), sin sesión ni barra de navegación. */
-    private function renderPublico(string $accion, array $datos = []): void
-    {
-        extract($datos);
-        require BASE_PATH . '/vistas/login.php';
     }
 
     /** Redirige a otra acción interna y detiene la ejecución del script actual. */

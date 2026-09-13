@@ -1,10 +1,9 @@
 <?php
 /**
- * Vista de grupos musculares (GrupoMuscularController). $accion decide el
- * contenido: listar, crear o editar.
+ * Catálogo de grupos musculares (GrupoMuscularController::index).
+ *
+ * Recibe del controlador: $usuarioSesion, $grupos.
  */
-$usuarioSesion = $_SESSION['user'] ?? null;
-$datos = $datos ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -404,7 +403,7 @@ $datos = $datos ?? [];
         <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>" class="activo">Grupos musculares</a>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Evaluaciones físicas</a>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
         <?php endif; ?>
     </div>
@@ -418,8 +417,6 @@ $datos = $datos ?? [];
 <?php endif; ?>
 
 <main class="contenedor">
-
-<?php if ($accion === 'listar'): ?>
 
     <section class="panel">
         <div class="panel-cabecera">
@@ -466,69 +463,6 @@ $datos = $datos ?? [];
             </table>
         </div>
     </section>
-
-<?php elseif ($accion === 'crear'): ?>
-
-    <section class="panel">
-        <div class="panel-cabecera">
-            <h1>Nuevo Grupo Muscular</h1>
-            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">← Volver</a>
-        </div>
-
-        <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'guardar']) ?>">
-            <div class="campo">
-                <label for="nombre">Nombre del grupo muscular</label>
-                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) ($datos['nombre'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: Pectorales, Cuádriceps, Deltoides..." required>
-            </div>
-            <div class="campo">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4" placeholder="Breve detalle anatómico o funcional..."><?= htmlspecialchars((string) ($datos['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
-            </div>
-            <div style="margin-top: 8px;">
-                <button type="submit" class="boton">Guardar grupo muscular</button>
-            </div>
-        </form>
-    </section>
-
-<?php elseif ($accion === 'editar'): ?>
-
-    <section class="panel">
-        <div class="panel-cabecera">
-            <h1>Editar Grupo Muscular</h1>
-            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">← Volver</a>
-        </div>
-
-        <?php if (!empty($error)): ?>
-            <div class="alerta alerta-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <form class="formulario" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'actualizar']) ?>">
-            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $grupo['id_grupo_muscular'], ENT_QUOTES, 'UTF-8') ?>">
-            <div class="campo">
-                <label for="nombre">Nombre del grupo muscular</label>
-                <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars((string) $grupo['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
-            </div>
-            <div class="campo">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4"><?= htmlspecialchars((string) ($grupo['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
-            </div>
-            <div style="margin-top: 8px;">
-                <button type="submit" class="boton">Guardar cambios</button>
-            </div>
-        </form>
-    </section>
-
-<?php endif; ?>
 
 </main>
 

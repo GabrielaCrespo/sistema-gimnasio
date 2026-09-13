@@ -3,8 +3,9 @@
  * Vista de portada / panel de bienvenida (LoginController::index()).
  * Sin sesión activa muestra un landing público; con sesión activa muestra
  * un panel de bienvenida con accesos rápidos según el rol.
+ *
+ * Recibe del controlador: $usuarioSesion (null si no hay sesión activa).
  */
-$usuarioSesion = $_SESSION['user'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -392,7 +393,7 @@ $usuarioSesion = $_SESSION['user'] ?? null;
             <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
                 <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
                 <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
-                <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">Registrar evaluación</a>
+                <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Evaluaciones físicas</a>
                 <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
             <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
                 <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
@@ -442,8 +443,8 @@ $usuarioSesion = $_SESSION['user'] ?? null;
                         <span class="flecha">→</span>
                     </a>
                 <?php elseif ($usuarioSesion['rol'] === 'instructor'): ?>
-                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>">
-                        <span>Registrar evaluación</span>
+                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">
+                        <span>Evaluaciones físicas</span>
                         <span class="flecha">→</span>
                     </a>
                     <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">

@@ -1,17 +1,16 @@
 <?php
 /**
- * Vista de evaluación física (EvaluacionFisicaController). $accion decide
- * el contenido: registrar (solo instructor) o historial (instructor o cliente).
+ * Formulario de edición de un ejercicio ya asignado a una rutina (RutinaController::editarEjercicio).
+ *
+ * Recibe del controlador: $usuarioSesion, $rutina, $detalle, $ejercicios, $dias, $error.
  */
-$usuarioSesion = $_SESSION['user'] ?? null;
-$datos = $datos ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluaciones Físicas - Sistema de Gimnasio</title>
+    <title>Gestión de Rutinas - Sistema de Gimnasio</title>
     <!-- Tipografía profesional -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,6 +40,7 @@ $datos = $datos ?? [];
             --color-peligro-borde: #fecaca;
             --color-exito: #10b981;
             --color-exito-claro: #ecfdf5;
+            --color-exito-borde: #a7f3d0;
 
             /* Radios y Sombras */
             --radio-lg: 20px;
@@ -178,7 +178,7 @@ $datos = $datos ?? [];
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 26px;
+            margin-bottom: 24px;
             padding-bottom: 18px;
             border-bottom: 1px solid var(--color-borde-suave);
         }
@@ -189,17 +189,40 @@ $datos = $datos ?? [];
             color: var(--color-texto);
         }
 
+        /* Subtarjeta / Sección Destacada */
+        .subseccion-tarjeta {
+            background: #fdfbfb;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            padding: 24px;
+            margin-top: 26px;
+        }
+
+        .subseccion-tarjeta-rosa {
+            background: var(--color-primario-suave);
+            border-color: var(--color-primario-borde);
+        }
+
+        .subseccion-titulo {
+            font-size: 1.15rem;
+            color: var(--color-texto);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Botones */
         .boton {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 11px 22px;
+            padding: 10px 20px;
             border-radius: var(--radio-md);
             background: linear-gradient(135deg, var(--color-primario) 0%, #ff5277 100%);
             color: #ffffff;
-            font-size: 0.94rem;
+            font-size: 0.92rem;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
@@ -229,113 +252,62 @@ $datos = $datos ?? [];
             transform: translateY(-2px);
         }
 
-        /* Formularios */
-        .formulario {
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-            margin-top: 10px;
+        .boton-peligro {
+            background: var(--color-peligro);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
 
-        .formulario-ancho {
-            max-width: 820px;
+        .boton-peligro:hover {
+            background: #dc2626;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
         }
 
-        .campo {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .boton-pequeno {
+            padding: 6px 14px;
+            font-size: 0.84rem;
+            border-radius: var(--radio-sm);
         }
 
-        .campo label {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--color-texto);
-        }
-
-        .campo input[type="text"],
-        .campo input[type="number"],
-        .campo select,
-        .campo textarea {
-            padding: 12px 14px;
-            border: 1px solid var(--color-borde-suave);
-            border-radius: var(--radio-md);
-            font-size: 0.94rem;
-            font-family: inherit;
-            background: #ffffff;
-            color: var(--color-texto);
-            transition: var(--transicion);
-        }
-
-        .campo input:focus,
-        .campo select:focus,
-        .campo textarea:focus {
-            outline: none;
-            border-color: var(--color-primario);
-            box-shadow: 0 0 0 4px var(--color-primario-suave);
-        }
-
-        .campo textarea {
-            resize: vertical;
-        }
-
-        .fila-formulario {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        /* Grid de Selección de Clientes */
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .tarjeta {
-            display: flex;
+        /* Insignias de Estado */
+        .insignia {
+            display: inline-flex;
             align-items: center;
-            gap: 14px;
-            padding: 18px 20px;
-            background: #ffffff;
-            border: 1px solid var(--color-borde-suave);
-            border-left: 4px solid var(--color-primario-borde);
-            border-radius: var(--radio-md);
-            color: var(--color-texto);
-            font-weight: 600;
-            font-size: 0.96rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-            transition: var(--transicion);
-        }
-
-        .tarjeta-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--color-primario-suave);
-            color: var(--color-primario);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
             font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .insignia::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .insignia-activa {
+            background: var(--color-exito-claro);
+            color: var(--color-exito);
+            border: 1px solid var(--color-exito-borde);
+        }
+
+        .insignia-completada {
+            background: var(--color-primario-suave);
+            color: var(--color-primario-hover);
             border: 1px solid var(--color-primario-borde);
         }
 
-        .tarjeta:hover {
-            border-color: var(--color-primario-borde);
-            border-left-color: var(--color-primario);
-            transform: translateY(-3px);
-            color: var(--color-primario-hover);
-            box-shadow: var(--sombra-tarjeta);
-            text-decoration: none;
-        }
-
-        .tarjeta:hover .tarjeta-avatar {
-            background: var(--color-primario);
-            color: #ffffff;
+        .insignia-cancelada {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
         }
 
         /* Tablas */
@@ -345,21 +317,20 @@ $datos = $datos ?? [];
             border-radius: var(--radio-md);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             background: #ffffff;
-            margin-top: 18px;
+            margin-top: 14px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            white-space: nowrap;
         }
 
         th {
             background: #faf4f7;
             color: var(--color-texto-suave);
             font-weight: 700;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
             padding: 14px 18px;
@@ -386,22 +357,100 @@ $datos = $datos ?? [];
             background: var(--color-primario-suave);
         }
 
-        .badge-dato {
-            display: inline-block;
-            background: var(--color-primario-suave);
-            color: var(--color-primario-hover);
-            border: 1px solid var(--color-primario-borde);
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+        td .acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Formularios */
+        .formulario {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 10px;
+            max-width: 680px;
+        }
+
+        .formulario-full {
+            max-width: none;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .campo label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--color-texto);
+        }
+
+        .campo input[type="text"],
+        .campo input[type="date"],
+        .campo input[type="number"],
+        .campo select {
+            padding: 11px 14px;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            font-size: 0.94rem;
+            font-family: inherit;
+            background: #ffffff;
+            color: var(--color-texto);
+            transition: var(--transicion);
+        }
+
+        .campo input:focus,
+        .campo select:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 4px var(--color-primario-suave);
+        }
+
+        .fila-formulario {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        /* Metadatos / Grid de Resumen en Vista 'Ver' */
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .resumen-card {
+            background: #faf7f8;
+            border: 1px solid var(--color-borde-suave);
+            border-radius: var(--radio-md);
+            padding: 14px 18px;
+        }
+
+        .resumen-card strong {
+            display: block;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-primario);
+            margin-bottom: 4px;
+        }
+
+        .resumen-card span {
+            font-size: 0.96rem;
+            font-weight: 600;
+            color: var(--color-texto);
         }
 
         /* Alertas */
         .alerta {
             padding: 14px 18px;
             border-radius: var(--radio-md);
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             font-size: 0.92rem;
             font-weight: 500;
             display: flex;
@@ -417,11 +466,11 @@ $datos = $datos ?? [];
 
         .texto-suave {
             color: var(--color-texto-suave);
-            font-size: 0.95rem;
+            font-size: 0.94rem;
         }
 
         .espacio-superior {
-            margin-top: 18px;
+            margin-top: 24px;
         }
 
         /* Pie de página */
@@ -450,6 +499,7 @@ $datos = $datos ?? [];
 </head>
 <body>
 
+<?php if ($usuarioSesion): ?>
 <nav class="nav">
     <div class="nav-marca">
         <span class="nav-marca-icono">
@@ -462,11 +512,11 @@ $datos = $datos ?? [];
         <?php if ($usuarioSesion['rol'] === 'instructor'): ?>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'grupoMuscular', 'action' => 'index']) ?>">Grupos musculares</a>
             <a href="<?= '/index.php?' . http_build_query(['controller' => 'ejercicio', 'action' => 'index']) ?>">Ejercicios</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'registrar']) ?>" class="<?= $accion === 'registrar' ? 'activo' : '' ?>">Registrar evaluación</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Evaluaciones físicas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>" class="activo">Rutinas</a>
         <?php elseif ($usuarioSesion['rol'] === 'cliente'): ?>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>">Mis rutinas</a>
-            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>" class="activo">Mis evaluaciones</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'index']) ?>" class="activo">Mis rutinas</a>
+            <a href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">Mis evaluaciones</a>
         <?php endif; ?>
     </div>
     <div class="nav-enlaces">
@@ -478,14 +528,14 @@ $datos = $datos ?? [];
         <a href="<?= '/index.php?' . http_build_query(['controller' => 'login', 'action' => 'logout']) ?>" class="nav-salir">Cerrar sesión</a>
     </div>
 </nav>
+<?php endif; ?>
 
 <main class="contenedor">
 
-<?php if ($accion === 'registrar'): ?>
-
     <section class="panel">
         <div class="panel-cabecera">
-            <h1>Registrar Evaluación Física</h1>
+            <h1>Editar ejercicio de "<?= htmlspecialchars((string) $rutina['nombre'], ENT_QUOTES, 'UTF-8') ?>"</h1>
+            <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'asignar', 'id' => $rutina['id_rutina']]) ?>">← Volver</a>
         </div>
 
         <?php if (!empty($error)): ?>
@@ -495,131 +545,57 @@ $datos = $datos ?? [];
             </div>
         <?php endif; ?>
 
-        <form class="formulario formulario-ancho" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'guardar']) ?>">
-            <div class="campo">
-                <label for="id_cliente">Cliente a evaluar</label>
-                <select id="id_cliente" name="id_cliente" required>
-                    <option value="">Selecciona un cliente</option>
-                    <?php foreach ($clientes as $cliente): ?>
-                        <option value="<?= htmlspecialchars((string) $cliente['id_cliente'], ENT_QUOTES, 'UTF-8') ?>" <?= (int) ($datos['id_cliente'] ?? 0) === (int) $cliente['id_cliente'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+        <form class="formulario formulario-full" method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'actualizarEjercicio']) ?>">
+            <input type="hidden" name="id_rutina" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="id_detalle" value="<?= htmlspecialchars((string) $detalle['id_detalle'], ENT_QUOTES, 'UTF-8') ?>">
+            <div class="fila-formulario">
+                <div class="campo" style="flex: 2;">
+                    <label for="id_ejercicio">Ejercicio</label>
+                    <select id="id_ejercicio" name="id_ejercicio" required>
+                        <option value="">Selecciona un ejercicio</option>
+                        <?php foreach ($ejercicios as $ejercicio): ?>
+                            <option value="<?= htmlspecialchars((string) $ejercicio['id_ejercicio'], ENT_QUOTES, 'UTF-8') ?>" <?= (int) $detalle['id_ejercicio'] === (int) $ejercicio['id_ejercicio'] ? 'selected' : '' ?>><?= htmlspecialchars((string) $ejercicio['nombre'], ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="campo" style="flex: 1;">
+                    <label for="dia_semana">Día de la semana</label>
+                    <select id="dia_semana" name="dia_semana" required>
+                        <?php foreach ($dias as $dia): ?>
+                            <option value="<?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?>" <?= $detalle['dia_semana'] === $dia ? 'selected' : '' ?>><?= htmlspecialchars((string) $dia, ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
 
             <div class="fila-formulario">
                 <div class="campo">
-                    <label for="peso">Peso corporal (kg)</label>
-                    <input type="number" step="0.01" id="peso" name="peso" placeholder="Ej: 72.50" value="<?= htmlspecialchars((string) ($datos['peso'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
+                    <label for="series">Series</label>
+                    <input type="number" id="series" name="series" min="1" value="<?= htmlspecialchars((string) $detalle['series'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
-                    <label for="altura">Estatura / Altura (m)</label>
-                    <input type="number" step="0.01" id="altura" name="altura" placeholder="Ej: 1.75" value="<?= htmlspecialchars((string) ($datos['altura'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
-                </div>
-            </div>
-
-            <div class="fila-formulario">
-                <div class="campo">
-                    <label for="porcentaje_grasa">% Grasa corporal</label>
-                    <input type="number" step="0.01" id="porcentaje_grasa" name="porcentaje_grasa" placeholder="Ej: 16.5" value="<?= htmlspecialchars((string) ($datos['porcentaje_grasa'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                    <label for="repeticiones">Repeticiones</label>
+                    <input type="number" id="repeticiones" name="repeticiones" min="1" value="<?= htmlspecialchars((string) $detalle['repeticiones'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="campo">
-                    <label for="masa_muscular">Masa muscular (kg)</label>
-                    <input type="number" step="0.01" id="masa_muscular" name="masa_muscular" placeholder="Ej: 34.2" value="<?= htmlspecialchars((string) ($datos['masa_muscular'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                    <label for="peso">Peso (kg, opcional)</label>
+                    <input type="number" id="peso" name="peso" min="0" step="0.01" value="<?= htmlspecialchars((string) ($detalle['peso'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej: 40">
                 </div>
                 <div class="campo">
-                    <label for="flexibilidad">Flexibilidad (cm)</label>
-                    <input type="number" step="0.01" id="flexibilidad" name="flexibilidad" placeholder="Ej: 5.0" value="<?= htmlspecialchars((string) ($datos['flexibilidad'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                    <label for="tiempo_descanso">Descanso (seg)</label>
+                    <input type="number" id="tiempo_descanso" name="tiempo_descanso" min="0" value="<?= htmlspecialchars((string) $detalle['tiempo_descanso'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
-            </div>
-
-            <div class="campo">
-                <label for="objetivo">Objetivo principal</label>
-                <input type="text" id="objetivo" name="objetivo" placeholder="Ej: Hipertrofia, recomposición corporal, pérdida de grasa..." value="<?= htmlspecialchars((string) ($datos['objetivo'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-            </div>
-
-            <div class="campo">
-                <label for="observaciones">Observaciones y notas adicionales</label>
-                <textarea id="observaciones" name="observaciones" rows="3" placeholder="Comentarios clínicos, antecedentes de lesiones o indicaciones dietéticas..."><?= htmlspecialchars((string) ($datos['observaciones'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+                <div class="campo">
+                    <label for="orden">Orden de ejecución</label>
+                    <input type="number" id="orden" name="orden" min="0" value="<?= htmlspecialchars((string) $detalle['orden'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
             </div>
 
             <div style="margin-top: 8px;">
-                <button type="submit" class="boton">Guardar evaluación</button>
+                <button type="submit" class="boton">Guardar cambios</button>
             </div>
         </form>
     </section>
-
-<?php elseif ($accion === 'historial'): ?>
-
-    <section class="panel">
-        <?php if ($clientes === null): ?>
-            <div class="panel-cabecera">
-                <h1>Mi Historial de Evaluaciones</h1>
-            </div>
-        <?php elseif ($clienteSeleccionado === null): ?>
-            <div class="panel-cabecera">
-                <div>
-                    <h1>Historial de Evaluaciones</h1>
-                    <p class="texto-suave">Selecciona un cliente para consultar su progreso y mediciones históricas.</p>
-                </div>
-            </div>
-            <div class="tarjetas">
-                <?php foreach ($clientes as $cliente): ?>
-                    <a class="tarjeta" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial', 'id' => $cliente['id_cliente']]) ?>">
-                        <span class="tarjeta-avatar"><?= mb_substr($cliente['nombres'], 0, 1) ?></span>
-                        <span><?= htmlspecialchars((string) ($cliente['nombres'] . ' ' . $cliente['apellidos']), ENT_QUOTES, 'UTF-8') ?></span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="panel-cabecera">
-                <h1>Historial: <?= htmlspecialchars((string) ($clienteSeleccionado['nombres'] . ' ' . $clienteSeleccionado['apellidos']), ENT_QUOTES, 'UTF-8') ?></h1>
-                <a class="boton boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'evaluacionFisica', 'action' => 'historial']) ?>">← Elegir otro cliente</a>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($clientes === null || $clienteSeleccionado !== null): ?>
-            <?php if (empty($evaluaciones)): ?>
-                <p class="texto-suave espacio-superior">Todavía no hay registros de evaluaciones para este perfil.</p>
-            <?php else: ?>
-                <div class="tabla-envoltura">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Peso</th>
-                                <th>Altura</th>
-                                <th>% Grasa</th>
-                                <th>Masa muscular</th>
-                                <th>Flexibilidad</th>
-                                <th>Objetivo</th>
-                                <th>Evaluador</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($evaluaciones as $evaluacion): ?>
-                                <tr>
-                                    <td style="font-weight: 600;"><?= htmlspecialchars((string) $evaluacion['fecha'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><span class="badge-dato"><?= htmlspecialchars((string) $evaluacion['peso'], ENT_QUOTES, 'UTF-8') ?> kg</span></td>
-                                    <td><?= htmlspecialchars((string) $evaluacion['altura'], ENT_QUOTES, 'UTF-8') ?> m</td>
-                                    <td><?= !empty($evaluacion['porcentaje_grasa']) ? htmlspecialchars((string) $evaluacion['porcentaje_grasa'], ENT_QUOTES, 'UTF-8') . '%' : '-' ?></td>
-                                    <td><?= !empty($evaluacion['masa_muscular']) ? htmlspecialchars((string) $evaluacion['masa_muscular'], ENT_QUOTES, 'UTF-8') . ' kg' : '-' ?></td>
-                                    <td><?= !empty($evaluacion['flexibilidad']) ? htmlspecialchars((string) $evaluacion['flexibilidad'], ENT_QUOTES, 'UTF-8') . ' cm' : '-' ?></td>
-                                    <td style="color: var(--color-texto-suave);"><?= htmlspecialchars((string) ($evaluacion['objetivo'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td style="font-size: 0.88rem; color: var(--color-texto); font-weight: 500;">
-                                        <?= htmlspecialchars((string) ($evaluacion['instructor_nombres'] . ' ' . $evaluacion['instructor_apellidos']), ENT_QUOTES, 'UTF-8') ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
-        <?php endif; ?>
-    </section>
-
-<?php endif; ?>
 
 </main>
 
