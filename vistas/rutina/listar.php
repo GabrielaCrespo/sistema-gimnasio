@@ -583,6 +583,10 @@
                                         <?php if ($rol === 'instructor'): ?>
                                             <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'editar', 'id' => $rutina['id_rutina']]) ?>">Editar</a>
                                             <a class="boton boton-pequeno boton-secundario" href="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'asignar', 'id' => $rutina['id_rutina']]) ?>">Ejercicios</a>
+                                            <form method="post" action="<?= '/index.php?' . http_build_query(['controller' => 'rutina', 'action' => 'eliminar']) ?>" onsubmit="return confirm('¿Eliminar esta rutina? También se eliminarán sus ejercicios asignados.');" style="margin: 0;">
+                                                <input type="hidden" name="id" value="<?= htmlspecialchars((string) $rutina['id_rutina'], ENT_QUOTES, 'UTF-8') ?>">
+                                                <button type="submit" class="boton boton-pequeno boton-peligro">Eliminar</button>
+                                            </form>
                                         <?php endif; ?>
                                     </div>
                                 </td>

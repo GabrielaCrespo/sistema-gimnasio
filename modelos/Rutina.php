@@ -102,4 +102,11 @@ class Rutina
 
         return $sentencia->fetchAll();
     }
+
+    /** Elimina la rutina; DETALLE_RUTINA se limpia solo por ON DELETE CASCADE. */
+    public function eliminar(int $id): void
+    {
+        $sentencia = $this->db->prepare('DELETE FROM RUTINA WHERE id_rutina = :id');
+        $sentencia->execute(['id' => $id]);
+    }
 }

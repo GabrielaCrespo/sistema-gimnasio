@@ -401,6 +401,28 @@ class RutinaController
         $this->redirect('rutina', 'asignar', ['id' => $idRutina]);
     }
 
+    /** Elimina una rutina completa. Solo puede eliminarla el instructor que la creó. */
+    public function eliminar(): void
+    {
+        $this->requireRole(['instructor']);
+
+        if (!(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
+            $this->redirect('rutina', 'index');
+            return;
+        }
+
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
+        if (is_string($id)) { $id = trim($id); }
+        $id = (int) $id;
+        $rutina = $this->rutinaModelo->buscarPorId($id);
+
+        if ($rutina && $this->esPropietario($rutina)) {
+            $this->rutinaModelo->eliminar($id);
+        }
+
+        $this->redirect('rutina', 'index');
+    }
+
     /** Quita un ejercicio de la rutina. */
     public function quitarEjercicio(): void
     {
